@@ -5,6 +5,7 @@
     <RadzenLabel Text="Select Value" Component="DropDownChangeEvent" />
     <RadzenDropDown Value="@selectedGuide" TValue="string" Data="@Guides" Change="@(args => selectedGuide = $"{args}")" Style="width: 100%; max-width: 400px;" Name="DropDownChangeEvent"></RadzenDropDown>
 
+    <RadzenStack Style="background-color:aliceblue">
     @if (selectedGuide != "Select Guide Type")
     {
         <TextEditor Toolbar="new Toolbar { ShowFullToolbar=true }" EditorContainerId="TestId" @ref="@MyEditor"
@@ -13,6 +14,8 @@
 
         <RadzenButton>Submit for review</RadzenButton>
     }
+    </RadzenStack>
+
 </RadzenStack>
 
 @code
