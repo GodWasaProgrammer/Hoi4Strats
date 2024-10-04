@@ -1,0 +1,16 @@
+﻿@page "/"
+
+<h3>Blazor Test</h3>
+
+<button @onclick="OnClick">Klicka här</button>
+<p>Du har klickat @clickCount gånger.</p>
+
+@code {
+    private int clickCount = 0;
+
+    private void OnClick()
+    {
+        clickCount++;
+    }
+}
+

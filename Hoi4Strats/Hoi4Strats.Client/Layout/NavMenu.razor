@@ -1,0 +1,43 @@
+﻿@implements IDisposable
+
+@inject NavigationManager NavigationManager
+
+@inherits LayoutComponentBase
+@layout MainLayout
+
+<RadzenSidebar>
+    <RadzenPanelMenu>
+        <RadzenPanelMenuItem Path="/" Text="Home" Icon="home" />
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text="Land">
+                <RadzenPanelMenuItem Text="Offence" />
+                <RadzenPanelMenuItem Text="Defence" />
+            </RadzenPanelMenuItem>
+        </RadzenPanelMenu>
+        <RadzenPanelMenuItem Path="/Sea" Text="Sea" />
+        <RadzenPanelMenuItem Path="Air" Text="Air" />
+        <RadzenPanelMenuItem Path="Country" Text="Country" />
+    </RadzenPanelMenu>
+</RadzenSidebar>
+
+@code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}
+
