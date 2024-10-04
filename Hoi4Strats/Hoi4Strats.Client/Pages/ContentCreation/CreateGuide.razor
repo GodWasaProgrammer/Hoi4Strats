@@ -1,0 +1,36 @@
+﻿@page "/CreateGuide"
+@using WYSIWYGTextEditor
+<h3>Create Guide</h3>
+<RadzenStack>
+    <RadzenLabel Text="Select Value" Component="DropDownChangeEvent" />
+    <RadzenDropDown Value="@selectedGuide" TValue="string" Data="@Guides" Change="@(args => selectedGuide = $"{args}")" Style="width: 100%; max-width: 400px;" Name="DropDownChangeEvent"></RadzenDropDown>
+
+    @if (selectedGuide != "Select Guide Type")
+    {
+        <TextEditor Toolbar="new Toolbar { ShowFullToolbar=true }" EditorContainerId="TestId" @ref="@MyEditor"
+                    Placeholder="Enter non HTML format like centering...">
+        </TextEditor>
+
+        <RadzenButton>Submit for review</RadzenButton>
+    }
+</RadzenStack>
+
+@code
+{
+    string selectedGuide = "Select Guide Type";
+    TextEditor MyEditor = new();
+    IEnumerable<string>? Guides;
+    Lists lists = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Guides = lists.Guidetypes;
+    }
+
+    public void SubmitGuide()
+    {
+        throw new NotImplementedException();
+    }
+}
+

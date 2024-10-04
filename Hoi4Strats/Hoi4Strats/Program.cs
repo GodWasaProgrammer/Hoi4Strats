@@ -48,6 +48,7 @@ namespace Hoi4Strats
                 .AddDefaultTokenProviders();
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+            builder.Services.AddCascadingAuthenticationState();
 
             var app = builder.Build();
 

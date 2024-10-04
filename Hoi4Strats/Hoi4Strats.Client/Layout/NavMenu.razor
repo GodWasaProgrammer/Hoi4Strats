@@ -18,7 +18,7 @@
         <RadzenPanelMenuItem Path="/Sea" Text="Sea">
             <RadzenPanelMenuItem Text="Design Guide" />
             <RadzenPanelMenuItem Text="Naval Superiority" />
-            <RadzenPanelMenuItem Text="General"/>
+            <RadzenPanelMenuItem Text="General" />
         </RadzenPanelMenuItem>
         <RadzenPanelMenuItem Path="Air" Text="Air">
             <RadzenPanelMenuItem Text="Design Guide">
@@ -164,6 +164,15 @@
 
             </RadzenPanelMenuItem>
         </RadzenPanelMenuItem>
+    </RadzenPanelMenu>
+    @* <RadzenPanelMenuItem Path="/Account/Login" Text="Login" /> *@
+    <RadzenPanelMenu>
+        <RadzenPanelMenuItem Path="/Account/Login" Text="Login" />
+        <AuthorizeView>
+            <RadzenPanelMenuItem Path="/CreateGuide" Text="Create Guide" />
+            <RadzenPanelMenuItem Path="/Inspector" Text="Review submissions" />
+        </AuthorizeView>
+        <RadzenPanelMenu></RadzenPanelMenu>
     </RadzenPanelMenu>
 </RadzenSidebar>
 
