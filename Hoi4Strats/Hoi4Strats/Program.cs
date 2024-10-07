@@ -29,20 +29,12 @@ namespace Hoi4Strats
                 options.Name = "MyApplicationTheme"; // The name of the cookie
                 options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
             });
-
-            builder.Services.AddAuthentication(options =>
-                {
-                    options.DefaultScheme = IdentityConstants.ApplicationScheme;
-                    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-                })
-                .AddIdentityCookies();
-
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddSignInManager()
                 .AddDefaultTokenProviders();

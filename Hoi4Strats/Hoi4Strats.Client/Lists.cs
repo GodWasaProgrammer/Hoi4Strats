@@ -2,8 +2,8 @@
 
 public class Lists
 {
-    public List<string> Guidetypes = new List<string>
-    {
+    private static readonly List<string> _GuideTypes =
+    [
         "Land",
         "Sea",
         "Air",
@@ -11,5 +11,6 @@ public class Lists
         "Air Design",
         "Land Template",
         "Sea Design"
-    };
+    ];
+    public List<string> Guidetypes = _GuideTypes;
 }
