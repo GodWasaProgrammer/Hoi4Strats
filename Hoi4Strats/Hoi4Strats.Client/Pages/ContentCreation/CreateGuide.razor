@@ -11,14 +11,26 @@
 @using Radzen
 @inject HttpClient client;
 <h3>Create Guide</h3>
-<RadzenStack>
-    <RadzenLabel Text="Select Value" Component="DropDownChangeEvent" />
-    <RadzenDropDown Value="@selectedGuide" TValue="string" Data="@Guides" Change="@(args => selectedGuide = $"{args}")" Style="width: 100%; max-width: 400px;" Name="DropDownChangeEvent"></RadzenDropDown>
 
+@if (Title == "")
+{
+    <RadzenTextBox Placeholder="Title?" @bind-Value="@Title"></RadzenTextBox>
+}
+
+@if (Title != "")
+{
+    @if (selectedGuide == "Select Guide Type")
+    {
+        <RadzenStack>
+            <RadzenLabel Text="Select Value" Component="DropDownChangeEvent" />
+            <RadzenDropDown Value="@selectedGuide" TValue="string" Data="@Guides" Change="@(args => selectedGuide = $"{args}")" Style="width: 100%; max-width: 400px;" Name="DropDownChangeEvent"></RadzenDropDown>
+        </RadzenStack>
+
+    }
     <RadzenStack>
         @if (selectedGuide != "Select Guide Type")
         {
-            <RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;"Input=@OnInput
+            <RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput
                               Change=@OnChange
                               Paste=@OnPaste
                               UploadComplete=@OnUploadComplete
@@ -29,10 +41,13 @@
         }
     </RadzenStack>
 
-</RadzenStack>
+}
+
 
 @code
 {
+    string Title = "";
+
     string htmlValue = @"<h2 style=""text-align:center"">Din guide här</h2>";
 
     void OnPaste(HtmlEditorPasteEventArgs args)
@@ -76,22 +91,14 @@
         var newGuide = new Guide
             {
                 Id = 0,
-                Title = "New Guide",
-                Content = "Guide content here...",
+                Title = Title,
+                Content = htmlValue,
                 Author = "Author Name",
                 CreatedAt = DateTime.UtcNow
             };
 
         var response = await client.PostAsJsonAsync("/create-guide", newGuide);
-
-        if (response.IsSuccessStatusCode)
-        {
-            Console.WriteLine("Guide successfully created!");
-        }
-        else
-        {
-            Console.WriteLine("Error creating guide.");
-        }
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Console.WriteLine($"Response Content: {responseContent}");
     }
-
 }
