@@ -48,6 +48,9 @@ namespace Hoi4Strats
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:5215/") });
+            builder.Services.AddControllersWithViews();
+            builder.Services.AddRazorPages();
+
 
             var app = builder.Build();
 
@@ -83,6 +86,31 @@ namespace Hoi4Strats
             {
                 await dbService.CreateGuide(guide);
                 return Results.Ok("Guide created successfully");
+            });
+
+            app.MapPost("/upload/image", async (HttpRequest request) =>
+            {
+                var form = await request.ReadFormAsync();
+                var file = form.Files.FirstOrDefault();
+
+                if (file != null)
+                {
+                    var filePath = Path.Combine("wwwroot", "uploads", file.FileName);
+
+                    // Se till att mappen "uploads" finns
+                    Directory.CreateDirectory(Path.Combine("wwwroot", "uploads"));
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    // Returnera URL till den uppladdade filen
+                    var fileUrl = $"/uploads/{file.FileName}";
+                    return Results.Ok(new { Url = fileUrl });
+                }
+
+                return Results.BadRequest("Ingen fil uppladdad.");
             });
 
             Tests.TestConnection();
