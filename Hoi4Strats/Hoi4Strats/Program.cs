@@ -65,8 +65,10 @@ namespace Hoi4Strats
 
             // Add additional endpoints required by the Identity /Account Razor components.
             app.MapAdditionalIdentityEndpoints();
-
+            var testing = new Tests();
+            testing.TestConnection();
             app.Run();
+
         }
     }
 }
