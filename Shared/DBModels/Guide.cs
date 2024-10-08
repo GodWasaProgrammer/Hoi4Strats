@@ -1,4 +1,4 @@
-﻿namespace Hoi4Strats.DBModels;
+﻿namespace Shared.DBModels;
 
 public class Guide
 {

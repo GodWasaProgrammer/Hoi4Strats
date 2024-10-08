@@ -23,11 +23,16 @@ namespace Hoi4Strats
             builder.Services.AddScoped<IdentityUserAccessor>();
             builder.Services.AddScoped<IdentityRedirectManager>();
             builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
+            var dbServiceString = builder.Configuration.GetConnectionString("SiteDB")
+                       ?? throw new InvalidOperationException("Connection string 'SiteDB' not found.");
+
+            // Registrera DBService med anslutningssträngen
+            builder.Services.AddScoped<DBService>(provider => new DBService(dbServiceString));
             builder.Services.AddRadzenComponents().AddScoped<ThemeService>().AddScoped<NotificationService>(); // För att hantera notifieringar
             builder.Services.AddRadzenCookieThemeService(options =>
             {
-                options.Name = "MyApplicationTheme"; // The name of the cookie
-                options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
+                options.Name = "MyApplicationTheme";
+                options.Duration = TimeSpan.FromDays(365);
             });
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -57,14 +62,15 @@ namespace Hoi4Strats
 
             app.UseStaticFiles();
             app.UseAntiforgery();
-
             app.MapRazorComponents<App>()
-                .AddInteractiveServerRenderMode()
-                .AddInteractiveWebAssemblyRenderMode()
-                .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
+               .AddInteractiveServerRenderMode()
+               .AddInteractiveWebAssemblyRenderMode()
+               .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
 
             // Add additional endpoints required by the Identity /Account Razor components.
             app.MapAdditionalIdentityEndpoints();
+
+            app.MapGet("/poop", () => "I'm a poop endpoint");
             var testing = new Tests();
             testing.TestConnection();
             app.Run();

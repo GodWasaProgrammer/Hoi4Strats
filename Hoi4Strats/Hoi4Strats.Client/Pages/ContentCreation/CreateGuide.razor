@@ -1,5 +1,7 @@
 ﻿@page "/CreateGuide"
+@using Shared.DBModels
 @using WYSIWYGTextEditor
+@inject HttpClient client;
 <h3>Create Guide</h3>
 <RadzenStack>
     <RadzenLabel Text="Select Value" Component="DropDownChangeEvent" />
@@ -12,7 +14,7 @@
                     Placeholder="Enter non HTML format like centering...">
         </TextEditor>
 
-        <RadzenButton>Submit for review</RadzenButton>
+        <RadzenButton Click="SubmitGuide">Submit for review</RadzenButton>
     }
     </RadzenStack>
 
@@ -31,9 +33,28 @@
         Guides = lists.Guidetypes;
     }
 
-    public void SubmitGuide()
+    public async Task SubmitGuide()
     {
-        throw new NotImplementedException();
+        var newGuide = new Guide
+            {
+                Id = 0,
+                Title = selectedGuide,
+                Content = await MyEditor.GetHTML(),
+                Author = "Author Name",
+                CreatedAt = DateTime.Now
+            };
+
+        var response = await client.PostAsJsonAsync("http://localhost:5118/api/guides", newGuide);
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Hantera framgång
+            Console.WriteLine("We wrote to DB");
+        }
+        else
+        {
+            Console.WriteLine("This shit broke as fuck");
+            // Hantera fel
+        }
     }
 }
-
