@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
+using Shared.DBModels;
 
 namespace Hoi4Strats
 {
@@ -23,8 +24,8 @@ namespace Hoi4Strats
             builder.Services.AddScoped<IdentityUserAccessor>();
             builder.Services.AddScoped<IdentityRedirectManager>();
             builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
-            var dbServiceString = builder.Configuration.GetConnectionString("SiteDB")
-                       ?? throw new InvalidOperationException("Connection string 'SiteDB' not found.");
+
+            var dbServiceString = DButils.GetConnectionString();
 
             // Registrera DBService med anslutningssträngen
             builder.Services.AddScoped<DBService>(provider => new DBService(dbServiceString));
@@ -46,6 +47,7 @@ namespace Hoi4Strats
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
             builder.Services.AddCascadingAuthenticationState();
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:5215/") });
 
             var app = builder.Build();
 
@@ -68,11 +70,22 @@ namespace Hoi4Strats
                .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
 
             // Add additional endpoints required by the Identity /Account Razor components.
+
             app.MapAdditionalIdentityEndpoints();
 
-            app.MapGet("/poop", () => "I'm a poop endpoint");
-            var testing = new Tests();
-            testing.TestConnection();
+            app.MapGet("/get-guides", async (DBService dbService) =>
+            {
+                var guides = await dbService.GetGuides();
+                return Results.Ok(guides);
+            });
+
+            app.MapPost("/create-guide", async (Guide guide, DBService dbService) =>
+            {
+                await dbService.CreateGuide(guide);
+                return Results.Ok("Guide created successfully");
+            });
+
+            Tests.TestConnection();
             app.Run();
 
         }

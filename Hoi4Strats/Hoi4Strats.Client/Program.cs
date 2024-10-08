@@ -12,9 +12,8 @@ namespace Hoi4Strats.Client
             builder.Services.AddAuthorizationCore();
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddRadzenComponents();
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-            // Registrera DBService med anslutningssträngen
-            builder.Services.AddScoped<HttpClient>();
             builder.Services.AddRadzenCookieThemeService(options =>
             {
                 options.Name = "MyApplicationTheme"; // The name of the cookie

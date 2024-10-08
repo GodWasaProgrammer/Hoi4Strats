@@ -14,7 +14,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8" />
     <PackageReference Include="Radzen.Blazor" Version="5.2.9" />
-    <PackageReference Include="WYSIWYGTextEditor" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>

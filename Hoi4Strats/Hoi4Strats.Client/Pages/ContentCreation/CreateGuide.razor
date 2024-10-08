@@ -1,21 +1,27 @@
 ﻿@page "/CreateGuide"
 @using Shared.DBModels
-@using WYSIWYGTextEditor
+@using Shared
+@using System
+@using Microsoft.JSInterop
+@using System.Collections.Generic
+@using System.Text
+@using System.Threading.Tasks
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using Radzen
 @inject HttpClient client;
 <h3>Create Guide</h3>
 <RadzenStack>
     <RadzenLabel Text="Select Value" Component="DropDownChangeEvent" />
     <RadzenDropDown Value="@selectedGuide" TValue="string" Data="@Guides" Change="@(args => selectedGuide = $"{args}")" Style="width: 100%; max-width: 400px;" Name="DropDownChangeEvent"></RadzenDropDown>
 
-    <RadzenStack Style="background-color:aliceblue">
-    @if (selectedGuide != "Select Guide Type")
-    {
-        <TextEditor Toolbar="new Toolbar { ShowFullToolbar=true }" EditorContainerId="TestId" @ref="@MyEditor"
-                    Placeholder="Enter non HTML format like centering...">
-        </TextEditor>
-
-        <RadzenButton Click="SubmitGuide">Submit for review</RadzenButton>
-    }
+    <RadzenStack>
+        @if (selectedGuide != "Select Guide Type")
+        {
+            <RadzenHtmlEditor UploadUrl="upload/image" />
+            //<EventConsole @ref=@console />
+            <RadzenButton Click="(() => SubmitGuide())">Submit for review</RadzenButton>
+        }
     </RadzenStack>
 
 </RadzenStack>
@@ -33,28 +39,62 @@
         Guides = lists.Guidetypes;
     }
 
-    public async Task SubmitGuide()
+    string htmlValue = @"<h2 style=""text-align:center"">Accelerated, smarter, and cost-effective Blazor development</h2>
+    <h3 style=""text-align:center"">Radzen Blazor Studio provides tons of productivity gains for Blazor developers</h3>
+    <div style=""text-align:center"">
+        <img alt=""Radzen Blazor Studio"" src=""images/radzen-blazor-studio-dark.png"" width=""300"">
+    </div>
+    <h4 style=""text-align:center"">Get started today. Radzen Blazor Studio is free to use.</h4>
+    <div style=""text-align:center"">
+        <a href=""https://www.radzen.com/blazor-studio/download/"" target=""_blank"" title=""Get Radzen Blazor Studio for Windows, Mac or Linux"">Download Now</a>
+    </div>";
+
+    void OnPaste(HtmlEditorPasteEventArgs args)
+    {
+        // console.Log($"Paste: {args.Html}");
+    }
+
+    void OnChange(string html)
+    {
+       // console.Log($"Change: {html}");
+    }
+
+    void OnInput(string html)
+    {
+       // console.Log($"Input: {html}");
+    }
+
+    void OnExecute(HtmlEditorExecuteEventArgs args)
+    {
+      //  console.Log($"Execute: {args.CommandName}");
+    }
+
+    void OnUploadComplete(UploadCompleteEventArgs args)
+    {
+      //  console.Log($"Upload complete: {args.RawResponse}");
+    }
+
+    private async Task SubmitGuide()
     {
         var newGuide = new Guide
             {
                 Id = 0,
-                Title = selectedGuide,
-                Content = await MyEditor.GetHTML(),
+                Title = "New Guide",
+                Content = "Guide content here...",
                 Author = "Author Name",
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
-        var response = await client.PostAsJsonAsync("http://localhost:5118/api/guides", newGuide);
+        var response = await client.PostAsJsonAsync("/create-guide", newGuide);
 
         if (response.IsSuccessStatusCode)
         {
-            // Hantera framgång
-            Console.WriteLine("We wrote to DB");
+            Console.WriteLine("Guide successfully created!");
         }
         else
         {
-            Console.WriteLine("This shit broke as fuck");
-            // Hantera fel
+            Console.WriteLine("Error creating guide.");
         }
     }
+
 }

@@ -28,7 +28,7 @@ public class DBService
                     command.Parameters.Add("@Title", SqlDbType.NVarChar).Value = GuideIn.Title;
                     command.Parameters.Add("@Content", SqlDbType.NVarChar).Value = GuideIn.Content;
                     command.Parameters.Add("@Author", SqlDbType.NVarChar).Value = GuideIn.Author;
-                    command.Parameters.Add("@CreatedAt", SqlDbType.DateTime).Value = DateTime.UtcNow;
+                    command.Parameters.Add("@CreatedAt", SqlDbType.DateTime).Value = DateTime.Now;
 
                     await command.ExecuteNonQueryAsync(); // Kör SQL-frågan
                 }
