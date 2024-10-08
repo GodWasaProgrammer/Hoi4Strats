@@ -31,6 +31,10 @@ public class DBService
                     command.Parameters.Add("@CreatedAt", SqlDbType.DateTime).Value = DateTime.Now;
 
                     await command.ExecuteNonQueryAsync(); // Kör SQL-frågan
+                    Console.WriteLine($"{GuideIn.Title} written to DB");
+                    Console.WriteLine($"{GuideIn.Content} written to DB");
+                    Console.WriteLine($"{GuideIn.Author} written to DB");
+                    Console.WriteLine($"{GuideIn.CreatedAt} written to DB");
                 }
             }
         }
