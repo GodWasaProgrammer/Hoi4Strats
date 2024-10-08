@@ -1,0 +1,34 @@
+﻿@inject HttpClient Http
+@using Radzen
+<h3>Hearts of Iron IV News</h3>
+
+@if (news == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div>
+        <RadzenLayout Style="height:auto; width:auto;">
+        @news
+        </RadzenLayout>
+    </div>
+}
+
+@code {
+    private string news = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.PostAsync("/get-hoi4-news", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            news = await response.Content.ReadAsStringAsync();
+        }
+        else
+        {
+            news = "Failed to load news.";
+        }
+    }
+}

@@ -1,7 +1,7 @@
 ﻿@implements IDisposable
 
 @inject NavigationManager NavigationManager
-
+@using Hoi4Strats.Client
 @inherits LayoutComponentBase
 @layout MainLayout
 
@@ -165,7 +165,6 @@
             </RadzenPanelMenuItem>
         </RadzenPanelMenuItem>
     </RadzenPanelMenu>
-    @* <RadzenPanelMenuItem Path="/Account/Login" Text="Login" /> *@
     <RadzenPanelMenu>
         <RadzenPanelMenuItem Path="/Account/Login" Text="Login" />
         <AuthorizeView>
@@ -174,6 +173,7 @@
         </AuthorizeView>
         <RadzenPanelMenu></RadzenPanelMenu>
     </RadzenPanelMenu>
+    <Hoi4Strats.Client.Pages.ExternalNewsFeed></Hoi4Strats.Client.Pages.ExternalNewsFeed>
 </RadzenSidebar>
 
 @code {

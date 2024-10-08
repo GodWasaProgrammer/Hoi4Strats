@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
 using Shared.DBModels;
+using System.Net;
 
 namespace Hoi4Strats
 {
@@ -14,7 +15,7 @@ namespace Hoi4Strats
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents()
@@ -64,7 +65,7 @@ namespace Hoi4Strats
             {
                 app.UseExceptionHandler("/Error");
             }
-
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseAntiforgery();
             app.MapRazorComponents<App>()
@@ -111,6 +112,13 @@ namespace Hoi4Strats
                 }
 
                 return Results.BadRequest("Ingen fil uppladdad.");
+            });
+
+            app.MapPost("/get-hoi4-news", async () =>
+            {
+                var steamapi = new SteamApiClient();
+                var news = await steamapi.GetNewsForHeartsOfIronAsync();
+                return Results.Ok(news);
             });
 
             Tests.TestConnection();
