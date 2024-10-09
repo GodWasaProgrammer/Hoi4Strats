@@ -4,8 +4,10 @@ using Hoi4Strats.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Radzen;
 using Shared.DBModels;
+using Shared.newsitems;
 using System.Net;
 
 namespace Hoi4Strats
@@ -48,7 +50,8 @@ namespace Hoi4Strats
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
             builder.Services.AddCascadingAuthenticationState();
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:5215/") });
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7141/") });
+            //builder.Services.AddHttpClient();
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
 
@@ -92,7 +95,7 @@ namespace Hoi4Strats
             app.MapPost("/upload/image", async (HttpRequest request) =>
             {
                 var form = await request.ReadFormAsync();
-                var file = form.Files.FirstOrDefault();
+                IFormFile? file = form.Files.FirstOrDefault();
 
                 if (file != null)
                 {
@@ -117,8 +120,17 @@ namespace Hoi4Strats
             app.MapPost("/get-hoi4-news", async () =>
             {
                 var steamapi = new SteamApiClient();
-                var news = await steamapi.GetNewsForHeartsOfIronAsync();
-                return Results.Ok(news);
+                var json = await steamapi.GetNewsForHeartsOfIronAsync();
+                var news = JsonConvert.DeserializeObject<Root>(json);
+                // Kontrollera om deserialisering lyckades
+                if (news != null)
+                {
+                    return Results.Ok(news);
+                }
+                else
+                {
+                    return Results.BadRequest("Deserialization failed.");
+                }
             });
 
             Tests.TestConnection();

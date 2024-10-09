@@ -9,7 +9,7 @@
             if (machineName == "DESKTOP-AJ1T1NR")
             {
                 // stationary
-                return "Server=localhost;Database=YourDatabase;User Id=youruser;Password=yourpassword;";
+                return "data source=DESKTOP-AJ1T1NR;initial catalog=SiteDB;trusted_connection=true;TrustServerCertificate=True;";
             }
             else if (machineName == "MSI")
             {

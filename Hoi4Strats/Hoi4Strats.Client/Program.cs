@@ -14,7 +14,6 @@ namespace Hoi4Strats.Client
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddRadzenComponents();
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-
             builder.Services.AddRadzenCookieThemeService(options =>
             {
                 options.Name = "MyApplicationTheme"; // The name of the cookie

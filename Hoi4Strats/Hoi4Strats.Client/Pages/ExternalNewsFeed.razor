@@ -1,5 +1,9 @@
 ﻿@inject HttpClient Http
+
+@using System.Text.Json;
 @using Radzen
+@using Shared
+@using Shared.newsitems
 <h3>Hearts of Iron IV News</h3>
 
 @if (news == null)
@@ -10,13 +14,13 @@ else
 {
     <div>
         <RadzenLayout Style="height:auto; width:auto;">
-        @news
+            @news
         </RadzenLayout>
     </div>
 }
 
 @code {
-    private string news = "";
+    private Root news = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -24,11 +28,30 @@ else
 
         if (response.IsSuccessStatusCode)
         {
-            news = await response.Content.ReadAsStringAsync();
+            string json = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(json); // Logga JSON för debugging
+
+            // Deserialisera JSON med System.Text.Json
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var root = JsonSerializer.Deserialize<Root>(json, options);
+
+            if (root != null && root.appnews != null)
+            {
+                foreach (var newsItem in root.appnews.newsitems)
+                {
+                    Console.WriteLine($"Title: {newsItem.title}, URL: {newsItem.url}");
+                }
+                news = root;
+            }
+            else
+            {
+                Console.WriteLine("Deserialisering misslyckades, root eller appnews är null.");
+            }
         }
         else
         {
-            news = "Failed to load news.";
+            Console.WriteLine("Failed to load news.");
         }
+
     }
 }
