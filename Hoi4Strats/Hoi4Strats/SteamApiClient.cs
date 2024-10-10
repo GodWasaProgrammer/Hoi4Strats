@@ -9,7 +9,7 @@ public class SteamApiClient
 
     public async Task<string> GetNewsForHeartsOfIronAsync()
     {
-        uint appId = 570;  // Hearts of Iron IV appid
+        uint appId = 394360;  // Hearts of Iron IV appid
         uint count = 1;       // Antal nyheter att hämta
         uint maxLength = 400000;  // Max längd på innehållet
 
