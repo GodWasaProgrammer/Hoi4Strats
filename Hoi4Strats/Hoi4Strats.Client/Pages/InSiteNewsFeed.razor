@@ -1,0 +1,22 @@
+﻿
+
+@foreach(var newsitem in News)
+{
+    <h3>@newsitem.Header</h3>
+    <text>@newsitem.NewsContent</text>
+}
+
+
+@code 
+{
+    List<SiteNews> News = new();
+
+    protected override void OnInitialized()
+    {
+        SiteNews testnews = new() { Header = "Hoi4Strats", NewsContent = "your site for all hoi4 related Guides,Templates, Designs and much more" };
+        News.Add(testnews);
+
+        SiteNews testnews2 = new() { Header = "We are now Live!", NewsContent = "Site is now LIVE!!!!!!!" };
+        News.Add(testnews2);
+    }
+}

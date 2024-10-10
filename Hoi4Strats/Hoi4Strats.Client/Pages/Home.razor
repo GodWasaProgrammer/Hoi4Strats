@@ -1,17 +1,10 @@
 ﻿@page "/"
-<RadzenText>
-Find all guides for your Hoi 4 Desires!
-</RadzenText>
 
-<button @onclick="OnClick">Klicka här</button>
-<p>Du har klickat @clickCount gånger.</p>
+<InSiteNewsFeed></InSiteNewsFeed>
 
-@code {
-    private int clickCount = 0;
 
-    private void OnClick()
-    {
-        clickCount++;
-    }
+@code 
+{
+    
 }
 
