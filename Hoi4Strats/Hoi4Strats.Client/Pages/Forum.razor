@@ -1,0 +1,28 @@
+﻿@using Shared.DBModels
+
+@page "/Forum"
+
+<h3>Forum</h3>
+
+<RadzenDataGrid TItem="ForumCategory" Data="@forumCategories" AllowPaging="true" PageSize="5">
+    <Columns>
+        <RadzenDataGridColumn Property="Name" Title="Category Name"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Description" Title="Description"></RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code
+{
+    public List<ForumCategory> forumCategories { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        var ForumCat1 = new ForumCategory { Name = "Shitposting", Description = "Do your worst Deplorables!", ID = 0 };
+        var ForumCat2 = new ForumCategory { Name = "Strategy talk", Description = "Let's talk Micro!", ID = 1 };
+        var ForumCat3 = new ForumCategory { Name = "Become a GuideMaker", Description = "Apply here!", ID = 2 };
+
+        forumCategories.Add(ForumCat1);
+        forumCategories.Add(ForumCat2);
+        forumCategories.Add(ForumCat3);
+    }
+}
