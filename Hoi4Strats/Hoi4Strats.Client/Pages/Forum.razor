@@ -6,8 +6,14 @@
 
 <RadzenDataGrid TItem="ForumCategory" Data="@forumCategories" AllowPaging="true" PageSize="5">
     <Columns>
-        <RadzenDataGridColumn Property="Name" Title="Category Name"></RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="Description" Title="Description"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Category and Description">
+            <Template Context="category">
+                <div @onclick="() => OnCategoryClicked(category)" style="cursor: pointer;">
+                    <div style="font-weight:bold; font-size: 1.2em;">@category.Name</div>
+                    <div style="font-style:italic; font-size:0.7em; margin-left: 2px;">@category.Description</div>
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
@@ -25,4 +31,13 @@
         forumCategories.Add(ForumCat2);
         forumCategories.Add(ForumCat3);
     }
+
+    private void OnCategoryClicked(ForumCategory category)
+    {
+        // Hantera klicket, t.ex. navigera till trådar i den här kategorin
+        Console.WriteLine($"Clicked on category: {category.Name}");
+        // NavigationManager.NavigateTo($"/forum/category/{category.ID}");
+    }
 }
+
+
