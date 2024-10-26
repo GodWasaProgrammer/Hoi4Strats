@@ -86,7 +86,7 @@ namespace Hoi4Strats
                 return Results.Ok(guides);
             });
 
-            app.MapPost("/create-guide", async (Guide guide, DBService dbService) =>
+            app.MapPost("/create-guide", async (GuideModel guide, DBService dbService) =>
             {
                 await dbService.CreateGuide(guide);
                 return Results.Ok("Guide created successfully");

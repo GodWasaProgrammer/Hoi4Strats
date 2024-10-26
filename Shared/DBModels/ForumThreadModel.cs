@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.DBModels
 {
-    public class ForumThread
+    public class ForumThreadModel
     {
         // id of thread
         public int Id { get; set; }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.DBModels
 {
-    public class ForumPost
+    public class ForumPostModel
     {
         public int Id { get; set; }
         public int ThreadID { get; set; }

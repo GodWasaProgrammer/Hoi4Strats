@@ -1,0 +1,78 @@
+﻿@page "/forum/category"
+@using Shared.DBModels
+
+<RadzenPanel Style="padding: 20px;">
+    <h3>@Category.Name</h3>
+    <p>@Category.Description</p>
+</RadzenPanel>
+
+<RadzenHeading Size="4">Threads in this category:</RadzenHeading>
+
+<RadzenDataGrid TItem="ForumThreadModel" Data="@Category.Threads" AllowFiltering="true" AllowSorting="true">
+    <Columns>
+        <RadzenDataGridColumn Title="Thread Title">
+            <Template Context="thread">
+                <div @onclick="() => OnThreadClicked(thread)" style="cursor: pointer;">
+                    <div style="font-weight:bold;">@thread.Title</div>
+                    <div style="font-style:italic; font-size:0.8em;">Created by @FetchScreenName(thread.UserID) on @thread.DateTime.ToString("yyyy-MM-dd HH:mm")</div>
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code
+{
+    [Parameter]
+    public int CategoryID { get; set; }
+
+    private ForumCategoryModel Category { get; set; }
+
+    private List<string> Makers = new();
+
+    protected override void OnInitialized()
+    {
+        FetchCategory();
+    }
+
+    // fake DB call
+    private string FetchScreenName(int UId)
+    {
+        switch (UId)
+        {
+            case 1:
+                return "Nomic";
+            case 2:
+                return "Benny";
+            case 3:
+                return "Harry";
+            default:
+                return "Woops, A User isnt Found.";
+        }
+
+    }
+    
+    // Mock
+    private void FetchCategory()
+    {
+        // Mocked category and threads data
+        Category = new ForumCategoryModel
+            {
+                ID = CategoryID,
+                Name = "ShitPosting",
+                Description = "Do your worst!",
+                Threads = new List<ForumThreadModel>
+            {
+                new ForumThreadModel { Title = "Best Forum ever?!", DateTime = DateTime.Now, ForumCategoryId = CategoryID, UserID = 1 },
+                new ForumThreadModel { Title = "What's new in the world?", DateTime = DateTime.Now.AddDays(-1), ForumCategoryId = CategoryID, UserID = 2 },
+                new ForumThreadModel { Title = "Share your thoughts!", DateTime = DateTime.Now.AddDays(-2), ForumCategoryId = CategoryID, UserID = 3 }
+            }
+            };
+    }
+
+    private void OnThreadClicked(ForumThreadModel thread)
+    {
+        // Logik för att navigera till trådens detaljer eller utföra annan åtgärd
+        Console.WriteLine($"Thread clicked: {thread.Title}");
+    }
+}

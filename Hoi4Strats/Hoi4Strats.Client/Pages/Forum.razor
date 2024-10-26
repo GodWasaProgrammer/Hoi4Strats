@@ -4,7 +4,7 @@
 
 <h3>Forum</h3>
 
-<RadzenDataGrid TItem="ForumCategory" Data="@forumCategories" AllowPaging="true" PageSize="5">
+<RadzenDataGrid TItem="ForumCategoryModel" Data="@forumCategories" AllowPaging="true" PageSize="5">
     <Columns>
         <RadzenDataGridColumn Title="Category and Description">
             <Template Context="category">
@@ -19,20 +19,20 @@
 
 @code
 {
-    public List<ForumCategory> forumCategories { get; set; } = new();
+    public List<ForumCategoryModel> forumCategories { get; set; } = new();
 
     protected override void OnInitialized()
     {
-        var ForumCat1 = new ForumCategory { Name = "Shitposting", Description = "Do your worst Deplorables!", ID = 0 };
-        var ForumCat2 = new ForumCategory { Name = "Strategy talk", Description = "Let's talk Micro!", ID = 1 };
-        var ForumCat3 = new ForumCategory { Name = "Become a GuideMaker", Description = "Apply here!", ID = 2 };
+        var ForumCat1 = new ForumCategoryModel { Name = "Shitposting", Description = "Do your worst Deplorables!", ID = 0 };
+        var ForumCat2 = new ForumCategoryModel { Name = "Strategy talk", Description = "Let's talk Micro!", ID = 1 };
+        var ForumCat3 = new ForumCategoryModel { Name = "Become a GuideMaker", Description = "Apply here!", ID = 2 };
 
         forumCategories.Add(ForumCat1);
         forumCategories.Add(ForumCat2);
         forumCategories.Add(ForumCat3);
     }
 
-    private void OnCategoryClicked(ForumCategory category)
+    private void OnCategoryClicked(ForumCategoryModel category)
     {
         // Hantera klicket, t.ex. navigera till trådar i den här kategorin
         Console.WriteLine($"Clicked on category: {category.Name}");

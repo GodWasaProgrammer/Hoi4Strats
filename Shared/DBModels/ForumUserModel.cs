@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.DBModels
 {
-    public class ForumUser
+    public class ForumUserModel
     {
         public int Id { get; set; }
         public string ScreenName { get; set; }

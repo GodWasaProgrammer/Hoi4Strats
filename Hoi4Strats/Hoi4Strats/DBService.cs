@@ -13,7 +13,7 @@ public class DBService
         _connectionString = connectionString;
     }
 
-    public async Task CreateGuide(Guide GuideIn)
+    public async Task CreateGuide(GuideModel GuideIn)
     {
         var query = "INSERT INTO Guides (Title, Content, Author, CreatedAt) VALUES (@Title, @Content, @Author, @CreatedAt)";
 
@@ -46,9 +46,9 @@ public class DBService
     }
 
 
-    public async Task<List<Guide>> GetGuides()
+    public async Task<List<GuideModel>> GetGuides()
     {
-        var guides = new List<Guide>();
+        var guides = new List<GuideModel>();
         var query = "SELECT Id, Title, Content, Author, CreatedAt FROM Guides";
 
         using (var connection = new SqlConnection(_connectionString))
@@ -60,7 +60,7 @@ public class DBService
             {
                 while (await reader.ReadAsync())
                 {
-                    var guide = new Guide
+                    var guide = new GuideModel
                     {
                         Id = reader.GetInt32(0),
                         Title = reader.GetString(1),
