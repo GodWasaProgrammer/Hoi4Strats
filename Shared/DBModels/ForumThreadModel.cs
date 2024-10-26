@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Shared.DBModels
+﻿namespace Shared.DBModels
 {
     public class ForumThreadModel
     {
@@ -14,6 +8,8 @@ namespace Shared.DBModels
         // id of creating User
         public int UserID { get; set; }
         public int ForumCategoryId { get; set; }
+        public List<ForumPostModel> Posts { get; set; }
+        public string Post { get; set; }
         public DateTime DateTime { get; set; }
     }
 }

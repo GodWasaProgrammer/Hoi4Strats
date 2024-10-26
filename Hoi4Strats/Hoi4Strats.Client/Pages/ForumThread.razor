@@ -1,0 +1,95 @@
+﻿@page "/forum/thread"
+@using Shared.DBModels
+
+<RadzenPanel Style="padding: 2px; border:double">
+    <h3>@Thread.Title</h3>
+    <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
+        <div style="width: 100px; margin-right: 10px;">
+            <div style="text-align: center; margin-bottom: 5px;">
+                <div style="font-weight: bold;">@FetchScreenName(Thread.UserID)</div>
+            </div>
+            <div style="border: 1px solid #ccc; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
+                <img src="@GetProfileImageUrl(Thread.UserID)" alt="Profile Image" style="max-width: 100%; max-height: 100%; border-radius: 50%;" />
+            </div>
+        </div>
+        <div style="flex: 1; max-width: calc(100% - 120px);">
+            <div style="font-style: italic; font-size: 0.8em;">Posted on @Thread.DateTime.ToString("yyyy-MM-dd HH:mm")</div>
+            <div style="overflow-wrap: break-word; word-wrap: break-word; overflow: hidden;">@Thread.Post</div>
+        </div>
+    </div>
+</RadzenPanel>
+
+@foreach (var post in Thread.Posts)
+{
+    <div style="display: flex; align-items: flex-start; margin-bottom: 15px; margin-top:15px; border:double">
+        <div style="width: 100px; margin-right: 10px;">
+            <div style="text-align: center; margin-bottom: 5px;">
+                <div style="font-weight: bold;">@FetchScreenName(post.UserID)</div>
+            </div>
+            <div style="border: 1px solid #ccc; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
+                <img src="@GetProfileImageUrl(post.UserID)" alt="Profile Image" style="max-width: 100%; max-height: 100%; border-radius: 50%;" />
+            </div>
+        </div>
+        <div style="flex: 1; max-width: calc(100% - 120px);">
+            <div style="font-style: italic; font-size: 0.8em;">Posted on @post.CreatedAt.ToString("yyyy-MM-dd HH:mm")</div>
+            <div style="overflow-wrap: break-word; word-wrap: break-word; overflow: hidden;">@post.Content</div>
+        </div>
+    </div>
+}
+
+@code
+{
+    [Parameter]
+    public int ThreadID { get; set; }
+
+    private ForumThreadModel Thread { get; set; }
+
+    protected override void OnInitialized()
+    {
+        FetchThread();
+    }
+
+    // Fake DB call to get screen name based on UserID
+    private string FetchScreenName(int UId)
+    {
+        return UId switch
+        {
+            1 => "Nomic",
+            2 => "Benny",
+            3 => "Harry",
+            _ => "Woops, A User isn't Found."
+        };
+    }
+
+    // Fake DB call to get profile image URL based on UserID
+    private string GetProfileImageUrl(int UId)
+    {
+        return UId switch
+        {
+            1 => "https://static.flashback.org/img/avatar/54/221304.jpg", // Replace with actual URL
+            2 => "https://static.flashback.org/img/avatar/0/3811.jpg", // Replace with actual URL
+            3 => "https://static.flashback.org/img/avatar/337/1381904.jpg", // Replace with actual URL
+            _ => "https://www.flashback.org/u1381904" // Default image URL
+        };
+    }
+
+    private void FetchThread()
+    {
+        // Mocked thread and posts data
+        Thread = new ForumThreadModel
+            {
+                Id = ThreadID,
+                Title = "Best Forum ever?!",
+                DateTime = DateTime.Now,
+                Post = "Hur kommer man igång med webbutveckling som nybörjare?\n\nHej allihopa!\n\nJag är ny på det här med webbutveckling och skulle verkligen uppskatta några tips för att komma igång. Jag har hört mycket om olika tekniker som HTML, CSS och JavaScript, men det känns lite överväldigande att veta var jag ska börja och hur allt hänger ihop. Finns det några specifika resurser eller kurser ni rekommenderar för en total nybörjare?\n\nMin plan är att så småningom bygga en egen webbsida, kanske en blogg eller ett portfolio för att visa mina framtida projekt. Jag är också nyfiken på om jag borde börja med frontend eller backend först, och om det är nödvändigt att lära sig båda delarna direkt. Är det bra att börja med enklare verktyg, eller ska man direkt dyka in i mer avancerade ramverk som React eller Vue?\n\nAlla förslag och erfarenheter är varmt välkomna! Om ni har gått igenom en liknande resa och vill dela era bästa tips eller berätta vad ni önskar att ni hade vetat när ni började, vore det toppen. Tack på förhand för er hjälp och vägledning!"
+            ,
+                UserID = 1,
+                Posts = new List<ForumPostModel>
+            {
+                new ForumPostModel { UserID = 1, Content = "I think it's great! This is a longer post to test how it wraps around. Let's see how it behaves in the layout.", CreatedAt = DateTime.Now },
+                new ForumPostModel { UserID = 2, Content = "Could be better... A bit more text here to see how it adjusts the size.", CreatedAt = DateTime.Now.AddMinutes(-10) },
+                new ForumPostModel { UserID = 3, Content = "I disagree completely! It needs more features and better organization. I've been in software engineering for 20+ years, and I'm still passionate about this job. I've been in software engineering for 20+ years, and I'm still passionate about this job. I think most people get burned out in this industry because they aim to work at big companies, where they are often dependent and work like slaves. In my opinion, the best jobs are at medium-sized or small companies, where you are recognized as a person and can do meaningful work. It also means you'll have a life and time to do other things. I've been in software engineering for 20+ years, and I'm still passionate about this job. I think most people get burned out in this industry because they aim to work at big companies, where they are often dependent and work like slaves. In my opinion, the best jobs are at medium-sized or small companies, where you are recognized as a person and can do meaningful work. It also means you'll have a life and time to do other things. I've been in software engineering for 20+ years, and I'm still passionate about this job. I think most people get burned out in this industry because they aim to work at big companies, where they are often dependent and work like slaves. In my opinion, the best jobs are at medium-sized or small companies, where you are recognized as a person and can do meaningful work. It also means you'll have a life and time to do other things. I've been in software engineering for 20+ years, and I'm still passionate about this job. I think most people get burned out in this industry because they aim to work at big companies, where they are often dependent and work like slaves. In my opinion, the best jobs are at medium-sized or small companies, where you are recognized as a person and can do meaningful work. It also means you'll have a life and time to do other things.", CreatedAt = DateTime.Now.AddMinutes(-20) }
+            }
+            };
+    }
+}
