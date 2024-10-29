@@ -45,7 +45,6 @@ public class DBService
         }
     }
 
-
     public async Task<List<GuideModel>> GetGuides()
     {
         var guides = new List<GuideModel>();
@@ -75,4 +74,3 @@ public class DBService
         return guides;
     }
 }
-
