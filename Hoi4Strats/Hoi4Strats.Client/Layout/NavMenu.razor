@@ -167,13 +167,15 @@
     </RadzenPanelMenu>
     <RadzenPanelMenu>
         <RadzenPanelMenuItem Path="/Account/Login" Text="Login" />
+        <AuthorizeView Roles="Admin">
+            <RadzenPanelMenuItem Path="/Admin" Text="AdminPanel" />
+        </AuthorizeView>
         <AuthorizeView>
             <RadzenPanelMenuItem Path="/CreateGuide" Text="Create Guide" />
             <RadzenPanelMenuItem Path="/Inspector" Text="Review submissions" />
         </AuthorizeView>
-        <RadzenPanelMenu></RadzenPanelMenu>
     </RadzenPanelMenu>
-    <Hoi4Strats.Client.Pages.ExtNewsFeed></Hoi4Strats.Client.Pages.ExtNewsFeed>
+    <Hoi4Strats.Client.Pages.ExtNewsFeed/>
 </RadzenSidebar>
 
 @code {

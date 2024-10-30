@@ -4,7 +4,7 @@
 
 <h4>Edit Roles for @SelectedUser?.UserName</h4>
 
-<RadzenDropDown TValue="string" Multiple="true" Data="@Roles" Change="@(args => SelectedRoles = ((IEnumerable<string>)args).ToList())" Placeholder="Select Roles" Value="SelectedRoles"/>
+<RadzenDropDown AllowSelectAll="false" TValue="string" Multiple="true" Data="@Roles" Change="@(args => SelectedRoles = ((IEnumerable<string>)args).ToList())" Placeholder="Select Roles" Value="SelectedRoles"/>
 
 <RadzenButton Text="Save Changes" Click="SaveChanges" />
 

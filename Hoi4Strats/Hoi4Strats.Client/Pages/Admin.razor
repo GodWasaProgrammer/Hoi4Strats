@@ -17,7 +17,7 @@
         <RadzenDataGridColumn TItem="ApplicationUser" Property="Email" Title="Email" />
         <RadzenDataGridColumn TItem="ApplicationUser" Title="Roles">
             <Template Context="user">
-                <UserRoleDisplay @ref="_userRoleDisplayref" UserId="@user.Id"></UserRoleDisplay>
+                <UserRoleDisplay @ref="userRoleDisplayRefs[user.Id]" UserId="@user.Id"></UserRoleDisplay>
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ApplicationUser" Context="user">
@@ -35,7 +35,7 @@
     private ApplicationUser? selectedUser;
     private bool isEditRoleDialogVisible = false;
     private List<string> selectedRoles = new();
-    private UserRoleDisplay _userRoleDisplayref;
+    private Dictionary<string, UserRoleDisplay> userRoleDisplayRefs = new Dictionary<string, UserRoleDisplay>();
 
     private async Task EditRoles(ApplicationUser user)
     {
@@ -66,10 +66,10 @@
                     Duration = 4000
                 });
         }
-        if (_userRoleDisplayref != null)
-{
-    await _userRoleDisplayref.Update();
-}
+        if (userRoleDisplayRefs.TryGetValue(user.Id, out var userRoleDisplay))
+        {
+            await userRoleDisplay.RefreshRoles();
+        }
     }
 
     protected override async Task OnInitializedAsync()
