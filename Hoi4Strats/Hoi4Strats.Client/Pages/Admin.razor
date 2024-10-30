@@ -1,12 +1,13 @@
 ﻿@page "/admin"
-@using Hoi4Strats.Components.Dialog
-@using Hoi4Strats.Data
+@using Hoi4Strats.Client.Pages.Dialog
+@using Hoi4Strats.Client.Services
+@using Microsoft.AspNetCore.Components.Rendering
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
-@inject UserManager<ApplicationUser> UserManager
-@inject RoleManager<IdentityRole> RoleManager
+@using Hoi4Strats.Client.Data
+@inject UserService UService
 @inject NotificationService NotificationService
-    @inject DialogService DialogService
+@inject DialogService DialogService
 
 <h3>Admin - User Management</h3>
 
@@ -30,7 +31,7 @@
 @code
 {
     private List<ApplicationUser> users = new();
-    private List<IdentityRole> roles = new();
+    private List<string> roles = new();
     private ApplicationUser? selectedUser;
     private bool isEditRoleDialogVisible = false;
     private List<string> selectedRoles = new();
@@ -38,15 +39,15 @@
     private async Task EditRoles(ApplicationUser user)
     {
         selectedUser = user;
-        selectedRoles = (await UserManager.GetRolesAsync(user)).ToList();
+        selectedRoles = await UService.GetRolesAsync(user.Id);
 
         // Skapa parameteruppsättningen med en Dictionary
         var parameters = new Dictionary<string, object>
-    {
-        { "SelectedUser", selectedUser },
-        { "SelectedRoles", selectedRoles },
-        { "Roles", roles }
-    };
+        {
+            { "SelectedUser", selectedUser },
+            { "SelectedRoles", selectedRoles },
+            { "Roles", roles }
+        };
 
         // Använd OpenAsync för att öppna dialogen med parametrar
         var dialogResult = await DialogService.OpenAsync<EditRolesDialog>("Edit Roles", parameters);
@@ -54,8 +55,7 @@
         if (dialogResult != null)
         {
             var newRoles = (List<string>)dialogResult;
-            await UserManager.RemoveFromRolesAsync(selectedUser, await UserManager.GetRolesAsync(selectedUser));
-            await UserManager.AddToRolesAsync(selectedUser, newRoles);
+            await UService.UpdateRolesAsync(selectedUser.Id, newRoles);
 
             NotificationService.Notify(new NotificationMessage
                 {
@@ -65,54 +65,27 @@
                     Duration = 4000
                 });
         }
+        await InvokeAsync(this.StateHasChanged);
     }
 
     protected override async Task OnInitializedAsync()
     {
-        users = await UserManager.Users.ToListAsync();
-        roles = await RoleManager.Roles.ToListAsync();
+        users = await UService.GetUsersAsync();
+        roles = await UService.GetAllRolesAsync();
     }
 
     private async Task OnUserSelect(ApplicationUser user)
     {
         selectedUser = user;
-        selectedRoles = (await UserManager.GetRolesAsync(user)).ToList();
+        selectedRoles = await UService.GetRolesAsync(user.Id);
         isEditRoleDialogVisible = true;
-    }
-
-    private async Task SaveRoleChanges()
-    {
-        if (selectedUser != null)
-        {
-            var currentRoles = await UserManager.GetRolesAsync(selectedUser);
-            await UserManager.RemoveFromRolesAsync(selectedUser, currentRoles);
-            await UserManager.AddToRolesAsync(selectedUser, selectedRoles);
-
-            NotificationService.Notify(new NotificationMessage
-                {
-                    Severity = NotificationSeverity.Success,
-                    Summary = "Roles Updated",
-                    Detail = $"Roles for {selectedUser.UserName} have been updated.",
-                    Duration = 4000
-                });
-
-            // Uppdatera rollerna i användarlistan
-            var updatedRoles = await UserManager.GetRolesAsync(selectedUser);
-            var userIndex = users.FindIndex(u => u.Id == selectedUser.Id);
-
-            if (userIndex != -1)
-            {
-                users[userIndex] = selectedUser; // uppdatera användaren i listan
-            }
-
-            isEditRoleDialogVisible = false;
-            selectedUser = null;
-        }
     }
 
     private RenderFragment RolesCellTemplate(ApplicationUser user) => builder =>
     {
-        var userRoles = UserManager.GetRolesAsync(user).Result; // Hämtar roller synkront för enkelhetens skull
-        builder.AddContent(0, string.Join(", ", userRoles));
+    builder.OpenComponent<UserRoleDisplay>(0);
+    builder.AddAttribute(1, "UserId", user.Id);
+    builder.CloseComponent();
     };
+
 }

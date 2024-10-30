@@ -1,3 +1,4 @@
+using Hoi4Strats.Client.Services;
 using Hoi4Strats.Components;
 using Hoi4Strats.Components.Account;
 using Hoi4Strats.Data;
@@ -28,10 +29,10 @@ public class Program
         builder.Services.AddScoped<IdentityUserAccessor>();
         builder.Services.AddScoped<IdentityRedirectManager>();
         builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
-
         var dbServiceString = DButils.GetConnectionString();
 
         builder.Services.AddScoped<DBService>(provider => new DBService(dbServiceString));
+        builder.Services.AddScoped<UserService>();
         builder.Services.AddRadzenComponents().AddScoped<ThemeService>().AddScoped<NotificationService>();
         builder.Services.AddRadzenCookieThemeService(options =>
         {
@@ -79,6 +80,9 @@ public class Program
            .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
 
         app.MapAdditionalIdentityEndpoints();
+        app.UseRouting();
+        app.UseAntiforgery();
+        app.MapControllers();
 
         // Custom endpoints
         app.MapGet("/get-guides", async (DBService dbService) =>
@@ -133,7 +137,7 @@ public class Program
 
     private static async Task EnsureRolesCreated(RoleManager<IdentityRole> roleManager)
     {
-        var roles = new[] { "Admin", "User", "Editor","Moderator","GuideAdmin","ForumAdmin"};
+        var roles = new[] { "Admin", "User", "Editor", "Moderator", "GuideAdmin", "ForumAdmin" };
 
         foreach (var role in roles)
         {

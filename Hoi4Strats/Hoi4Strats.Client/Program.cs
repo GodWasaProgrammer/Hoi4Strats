@@ -1,3 +1,4 @@
+using Hoi4Strats.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Radzen;
@@ -10,6 +11,7 @@ internal class Program
     {
         var builder = WebAssemblyHostBuilder.CreateDefault(args);
         System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+        builder.Services.AddSingleton<UserService>();
         builder.Services.AddAuthorizationCore();
         builder.Services.AddCascadingAuthenticationState();
         builder.Services.AddRadzenComponents();

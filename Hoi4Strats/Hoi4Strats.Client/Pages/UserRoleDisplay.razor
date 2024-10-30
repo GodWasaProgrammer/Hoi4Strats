@@ -1,0 +1,26 @@
+﻿@page "/user-role-display"
+@using Hoi4Strats.Client.Services
+@inject UserService UService
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+
+    private List<string> _roles;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _roles = await UService.GetRolesAsync(UserId);
+        _isLoading = false;
+    }
+}
+
+@if (_isLoading)
+{
+    <span>Laddar roller...</span>
+}
+else
+{
+    <span>@string.Join(", ", _roles)</span>
+}

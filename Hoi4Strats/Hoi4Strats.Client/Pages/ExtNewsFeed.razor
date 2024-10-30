@@ -43,36 +43,36 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await Http.PostAsync("/get-hoi4-news", null);
+        // var response = await Http.PostAsync("/get-hoi4-news", null);
 
-        if (response.IsSuccessStatusCode)
-        {
-            string json = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(json); // Logga JSON för debugging
+        // if (response.IsSuccessStatusCode)
+        // {
+        //     string json = await response.Content.ReadAsStringAsync();
+        //     Console.WriteLine(json); // Logga JSON för debugging
 
-            // Deserialisera JSON med System.Text.Json
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var root = JsonSerializer.Deserialize<Root>(json, options);
+        //     // Deserialisera JSON med System.Text.Json
+        //     var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        //     var root = JsonSerializer.Deserialize<Root>(json, options);
 
-            if (root != null && root.appnews != null)
-            {
-                foreach (var newsItem in root.appnews.newsitems)
-                {
-                    Console.WriteLine($"Title: {newsItem.title}, URL: {newsItem.url}");
-                }
-                this.root = root;
-                fulltext = root.appnews.newsitems[0].contents;
-                displayedtext = fulltext.Length > 300 ? fulltext.Substring(0, 300) + "..." : fulltext;
-            }
-            else
-            {
-                Console.WriteLine("Deserialisering misslyckades, root eller appnews är null.");
-            }
-        }
-        else
-        {
-            Console.WriteLine("Failed to load news.");
-        }
+        //     if (root != null && root.appnews != null)
+        //     {
+        //         foreach (var newsItem in root.appnews.newsitems)
+        //         {
+        //             Console.WriteLine($"Title: {newsItem.title}, URL: {newsItem.url}");
+        //         }
+        //         this.root = root;
+        //         fulltext = root.appnews.newsitems[0].contents;
+        //         displayedtext = fulltext.Length > 300 ? fulltext.Substring(0, 300) + "..." : fulltext;
+        //     }
+        //     else
+        //     {
+        //         Console.WriteLine("Deserialisering misslyckades, root eller appnews är null.");
+        //     }
+        // }
+        // else
+        // {
+        //     Console.WriteLine("Failed to load news.");
+        // }
 
     }
 }

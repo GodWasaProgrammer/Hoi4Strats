@@ -1,22 +1,21 @@
 ﻿@page "/edit-roles-dialog"
-@using Hoi4Strats.Data
-@using Microsoft.AspNetCore.Identity
+@using Hoi4Strats.Client.Data
 @inject DialogService DialogService
 
 <h4>Edit Roles for @SelectedUser?.UserName</h4>
-<RadzenDropDown TValue="List<string>" Multiple="true" Data="@Roles"
-                @bind-Value="SelectedRoles" TextProperty="Name" ValueProperty="Name" />
+
+<RadzenDropDown TValue="string" Multiple="true" Data="@Roles" Change="@(args => SelectedRoles = ((IEnumerable<string>)args).ToList())"/>
 
 <RadzenButton Text="Save Changes" Click="SaveChanges" />
 
-@code {
+@code 
+{
     [Parameter] public ApplicationUser SelectedUser { get; set; }
-    [Parameter] public List<string> SelectedRoles { get; set; }
-    [Parameter] public List<IdentityRole> Roles { get; set; }
+    [Parameter] public List<string> SelectedRoles { get; set; } // För valda roller
+    [Parameter] public List<string> Roles { get; set; } // Roller som ska visas i drop-down
 
     private void SaveChanges()
     {
         DialogService.Close(SelectedRoles); // Skickar tillbaka de valda rollerna som resultat
     }
 }
-
