@@ -1,20 +1,7 @@
 ﻿@page "/user-role-display"
+@using Hoi4Strats.Client.Data
 @using Hoi4Strats.Client.Services
 @inject UserService UService
-
-@code {
-    [Parameter]
-    public string UserId { get; set; }
-
-    private List<string> _roles;
-    private bool _isLoading = true;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _roles = await UService.GetRolesAsync(UserId);
-        _isLoading = false;
-    }
-}
 
 @if (_isLoading)
 {
@@ -23,4 +10,25 @@
 else
 {
     <span>@string.Join(", ", _roles)</span>
+}
+
+@code 
+{
+    [Parameter]
+    public string ?UserId { get; set; }
+
+    public async Task Update()
+    {
+        _roles = await UService.GetRolesAsync(UserId);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private List<string> ?_roles;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _roles = await UService.GetRolesAsync(UserId);
+        _isLoading = false;
+    }
 }

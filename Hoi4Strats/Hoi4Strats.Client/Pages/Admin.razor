@@ -17,7 +17,7 @@
         <RadzenDataGridColumn TItem="ApplicationUser" Property="Email" Title="Email" />
         <RadzenDataGridColumn TItem="ApplicationUser" Title="Roles">
             <Template Context="user">
-                @RolesCellTemplate(user)
+                <UserRoleDisplay @ref="_userRoleDisplayref" UserId="@user.Id"></UserRoleDisplay>
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ApplicationUser" Context="user">
@@ -35,6 +35,7 @@
     private ApplicationUser? selectedUser;
     private bool isEditRoleDialogVisible = false;
     private List<string> selectedRoles = new();
+    private UserRoleDisplay _userRoleDisplayref;
 
     private async Task EditRoles(ApplicationUser user)
     {
@@ -65,7 +66,10 @@
                     Duration = 4000
                 });
         }
-        await InvokeAsync(this.StateHasChanged);
+        if (_userRoleDisplayref != null)
+{
+    await _userRoleDisplayref.Update();
+}
     }
 
     protected override async Task OnInitializedAsync()
@@ -83,9 +87,9 @@
 
     private RenderFragment RolesCellTemplate(ApplicationUser user) => builder =>
     {
-    builder.OpenComponent<UserRoleDisplay>(0);
-    builder.AddAttribute(1, "UserId", user.Id);
-    builder.CloseComponent();
+        builder.OpenComponent<UserRoleDisplay>(0);
+        builder.AddAttribute(1, "UserId", user.Id);
+        builder.CloseComponent();
     };
 
 }
