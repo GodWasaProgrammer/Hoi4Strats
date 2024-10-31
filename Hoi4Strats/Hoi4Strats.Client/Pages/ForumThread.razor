@@ -1,40 +1,43 @@
 ﻿@page "/forum/thread"
 @using SharedProj.DBModels
 
-<RadzenPanel Style="padding: 2px; border:double">
-    <h3>@Thread.Title</h3>
-    <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
-        <div style="width: 100px; margin-right: 10px;">
-            <div style="text-align: center; margin-bottom: 5px;">
-                <div style="font-weight: bold;">@FetchScreenName(Thread.UserID)</div>
-            </div>
-            <div style="border: 1px solid #ccc; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
-                <img src="@GetProfileImageUrl(Thread.UserID)" alt="Profile Image" style="max-width: 100%; max-height: 100%; border-radius: 50%;" />
-            </div>
-        </div>
-        <div style="flex: 1; max-width: calc(100% - 120px);">
-            <div style="font-style: italic; font-size: 0.8em;">Posted on @Thread.DateTime.ToString("yyyy-MM-dd HH:mm")</div>
-            <div style="overflow-wrap: break-word; word-wrap: break-word; overflow: hidden;">@Thread.Post</div>
-        </div>
-    </div>
-</RadzenPanel>
-
-@foreach (var post in Thread.Posts)
+@if (Thread != null)
 {
-    <div style="display: flex; align-items: flex-start; margin-bottom: 15px; margin-top:15px; border:double">
-        <div style="width: 100px; margin-right: 10px;">
-            <div style="text-align: center; margin-bottom: 5px;">
-                <div style="font-weight: bold;">@FetchScreenName(post.UserID)</div>
+    <RadzenPanel Style="padding: 2px; border:double">
+        <h3>@Thread.Title</h3>
+        <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
+            <div style="width: 100px; margin-right: 10px;">
+                <div style="text-align: center; margin-bottom: 5px;">
+                    <div style="font-weight: bold;">@FetchScreenName(Thread.UserID)</div>
+                </div>
+                <div style="border: 1px solid #ccc; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
+                    <img src="@GetProfileImageUrl(Thread.UserID)" alt="Profile Image" style="max-width: 100%; max-height: 100%; border-radius: 50%;" />
+                </div>
             </div>
-            <div style="border: 1px solid #ccc; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
-                <img src="@GetProfileImageUrl(post.UserID)" alt="Profile Image" style="max-width: 100%; max-height: 100%; border-radius: 50%;" />
+            <div style="flex: 1; max-width: calc(100% - 120px);">
+                <div style="font-style: italic; font-size: 0.8em;">Posted on @Thread.DateTime.ToString("yyyy-MM-dd HH:mm")</div>
+                <div style="overflow-wrap: break-word; word-wrap: break-word; overflow: hidden;">@Thread.Post</div>
             </div>
         </div>
-        <div style="flex: 1; max-width: calc(100% - 120px);">
-            <div style="font-style: italic; font-size: 0.8em;">Posted on @post.CreatedAt.ToString("yyyy-MM-dd HH:mm")</div>
-            <div style="overflow-wrap: break-word; word-wrap: break-word; overflow: hidden;">@post.Content</div>
+    </RadzenPanel>
+
+    @foreach (var post in Thread.Posts)
+    {
+        <div style="display: flex; align-items: flex-start; margin-bottom: 15px; margin-top:15px; border:double">
+            <div style="width: 100px; margin-right: 10px;">
+                <div style="text-align: center; margin-bottom: 5px;">
+                    <div style="font-weight: bold;">@FetchScreenName(post.UserID)</div>
+                </div>
+                <div style="border: 1px solid #ccc; padding: 5px; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
+                    <img src="@GetProfileImageUrl(post.UserID)" alt="Profile Image" style="max-width: 100%; max-height: 100%; border-radius: 50%;" />
+                </div>
+            </div>
+            <div style="flex: 1; max-width: calc(100% - 120px);">
+                <div style="font-style: italic; font-size: 0.8em;">Posted on @post.CreatedAt.ToString("yyyy-MM-dd HH:mm")</div>
+                <div style="overflow-wrap: break-word; word-wrap: break-word; overflow: hidden;">@post.Content</div>
+            </div>
         </div>
-    </div>
+    }
 }
 
 @code
@@ -42,7 +45,7 @@
     [Parameter]
     public int ThreadID { get; set; }
 
-    private ForumThreadModel Thread { get; set; }
+    private ForumThreadModel? Thread { get; set; }
 
     protected override void OnInitialized()
     {
@@ -82,7 +85,7 @@
                 Title = "Best Forum ever?!",
                 DateTime = DateTime.Now,
                 Post = "Hur kommer man igång med webbutveckling som nybörjare?\n\nHej allihopa!\n\nJag är ny på det här med webbutveckling och skulle verkligen uppskatta några tips för att komma igång. Jag har hört mycket om olika tekniker som HTML, CSS och JavaScript, men det känns lite överväldigande att veta var jag ska börja och hur allt hänger ihop. Finns det några specifika resurser eller kurser ni rekommenderar för en total nybörjare?\n\nMin plan är att så småningom bygga en egen webbsida, kanske en blogg eller ett portfolio för att visa mina framtida projekt. Jag är också nyfiken på om jag borde börja med frontend eller backend först, och om det är nödvändigt att lära sig båda delarna direkt. Är det bra att börja med enklare verktyg, eller ska man direkt dyka in i mer avancerade ramverk som React eller Vue?\n\nAlla förslag och erfarenheter är varmt välkomna! Om ni har gått igenom en liknande resa och vill dela era bästa tips eller berätta vad ni önskar att ni hade vetat när ni började, vore det toppen. Tack på förhand för er hjälp och vägledning!"
-            ,
+                ,
                 UserID = 1,
                 Posts = new List<ForumPostModel>
             {

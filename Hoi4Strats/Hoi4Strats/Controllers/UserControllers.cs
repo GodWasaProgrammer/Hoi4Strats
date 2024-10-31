@@ -1,5 +1,4 @@
 ﻿namespace Hoi4Strats.Controllers;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -44,15 +43,17 @@ public class UserController : ControllerBase
     [HttpPost("UpdateRoles")]
     public async Task<IActionResult> UpdateRoles([FromBody] UpdateRolesDto updateRolesDto)
     {
-        var user = await _userManager.FindByIdAsync(updateRolesDto.UserId);
-        if (user == null)
+        if (updateRolesDto != null && updateRolesDto.Roles != null && updateRolesDto.UserId != null)
         {
-            return NotFound();
+            var user = await _userManager.FindByIdAsync(updateRolesDto.UserId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            await _userManager.AddToRolesAsync(user, updateRolesDto.Roles);
         }
-
-        var currentRoles = await _userManager.GetRolesAsync(user);
-        await _userManager.RemoveFromRolesAsync(user, currentRoles);
-        await _userManager.AddToRolesAsync(user, updateRolesDto.Roles);
 
         return NoContent();
     }
@@ -64,11 +65,3 @@ public class UserController : ControllerBase
         return Ok(roles);
     }
 }
-
-// Data Transfer Object (DTO) för att uppdatera roller
-public class UpdateRolesDto
-{
-    public string UserId { get; set; }
-    public List<string> Roles { get; set; }
-}
-

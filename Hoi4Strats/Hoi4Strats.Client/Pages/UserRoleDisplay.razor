@@ -1,21 +1,31 @@
-﻿@using Hoi4Strats.Client.Data
+﻿@using SharedProj
 @using Hoi4Strats.Client.Services
 @inject UserService UService
 
 @if (_isLoading)
 {
-    <span>Laddar roller...</span>
+        <span>Laddar roller...</span>
 }
 else
 {
-    <span>@string.Join(", ", _roles)</span>
+    @if (_roles != null)
+    {   
+        @if(_roles.Count > 0)
+        {
+            <span>@string.Join(", ", _roles)</span>
+        }
+        else
+        {
+            <span>@_noRoles</span>
+        }
+    }
 }
 
 @code
 {
     [Parameter]
     public string? UserId { get; set; }
-
+    private string _noRoles = "No Roles";
     private List<string>? _roles;
     private bool _isLoading = true;
 

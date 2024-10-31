@@ -1,4 +1,4 @@
-﻿using Hoi4Strats.Client.Data;
+﻿using SharedProj;
 using System.Net.Http.Json;
 
 namespace Hoi4Strats.Client.Services;
@@ -14,12 +14,30 @@ public class UserService
 
     public async Task<List<ApplicationUser>> GetUsersAsync()
     {
-        return await _httpClient.GetFromJsonAsync<List<ApplicationUser>>("api/User/GetUsers");
+        var result = await _httpClient.GetFromJsonAsync<List<ApplicationUser>>("api/User/GetUsers");
+
+        if (result == null)
+        {
+            throw new HttpRequestException("Failed to retrieve users");
+        }
+        else
+        {
+            return result;
+        }
     }
 
     public async Task<List<string>> GetRolesAsync(string userId)
     {
-        return await _httpClient.GetFromJsonAsync<List<string>>($"api/User/GetRoles/{userId}");
+        var result = await _httpClient.GetFromJsonAsync<List<string>>($"api/User/GetRoles/{userId}");
+
+        if (result == null)
+        {
+            throw new HttpRequestException($"Failed to fetch roles for user{userId}");
+        }
+        else
+        {
+            return result;
+        }
     }
 
     public async Task UpdateRolesAsync(string userId, List<string> roles)
@@ -31,13 +49,15 @@ public class UserService
 
     public async Task<List<string>> GetAllRolesAsync()
     {
-        return await _httpClient.GetFromJsonAsync<List<string>>("api/User/GetAllRoles");
+        var result = await _httpClient.GetFromJsonAsync<List<string>>("api/User/GetAllRoles");
+
+        if (result == null)
+        {
+            throw new HttpRequestException("Failed to retrieve all possible roles");
+        }
+        else
+        {
+            return result;
+        }
     }
-}
-
-
-public class UpdateRolesDto
-{
-    public string UserId { get; set; }
-    public List<string> Roles { get; set; }
 }

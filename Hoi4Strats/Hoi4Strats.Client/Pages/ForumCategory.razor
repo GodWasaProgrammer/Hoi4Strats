@@ -1,32 +1,34 @@
 ﻿@page "/forum/category"
 @using SharedProj.DBModels
+@if (Category != null)
+{
+    <RadzenPanel Style="padding: 20px;">
+        <h3>@Category.Name</h3>
+        <p>@Category.Description</p>
+    </RadzenPanel>
 
-<RadzenPanel Style="padding: 20px;">
-    <h3>@Category.Name</h3>
-    <p>@Category.Description</p>
-</RadzenPanel>
+    <RadzenHeading Size="4">Threads in this category:</RadzenHeading>
 
-<RadzenHeading Size="4">Threads in this category:</RadzenHeading>
-
-<RadzenDataGrid TItem="ForumThreadModel" Data="@Category.Threads" AllowFiltering="true" AllowSorting="true">
-    <Columns>
-        <RadzenDataGridColumn Title="Thread Title">
-            <Template Context="thread">
-                <div @onclick="() => OnThreadClicked(thread)" style="cursor: pointer;">
-                    <div style="font-weight:bold;">@thread.Title</div>
-                    <div style="font-style:italic; font-size:0.8em;">Created by @FetchScreenName(thread.UserID) on @thread.DateTime.ToString("yyyy-MM-dd HH:mm")</div>
-                </div>
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+    <RadzenDataGrid TItem="ForumThreadModel" Data="@Category.Threads" AllowFiltering="true" AllowSorting="true">
+        <Columns>
+            <RadzenDataGridColumn Title="Thread Title">
+                <Template Context="thread">
+                    <div @onclick="() => OnThreadClicked(thread)" style="cursor: pointer;">
+                        <div style="font-weight:bold;">@thread.Title</div>
+                        <div style="font-style:italic; font-size:0.8em;">Created by @FetchScreenName(thread.UserID) on @thread.DateTime.ToString("yyyy-MM-dd HH:mm")</div>
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+}
 
 @code
 {
     [Parameter]
     public int CategoryID { get; set; }
 
-    private ForumCategoryModel Category { get; set; }
+    private ForumCategoryModel? Category { get; set; }
 
     private List<string> Makers = new();
 
@@ -51,7 +53,7 @@
         }
 
     }
-    
+
     // Mock
     private void FetchCategory()
     {

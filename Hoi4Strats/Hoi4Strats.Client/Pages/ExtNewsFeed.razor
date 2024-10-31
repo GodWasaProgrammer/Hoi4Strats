@@ -17,10 +17,13 @@ else
         @if (root != null)
         {
             <RadzenLayout Style="height:auto; width:auto;">
-                @if (root != null)
+                @if (root.appnews != null)
                 {
                     <RadzenStack>
-                        <h3>@root.appnews.newsitems[0].title</h3>
+                        @if (root.appnews.newsitems[0].title != null)
+                        {
+                            <h3>@root.appnews.newsitems[0].title</h3>
+                        }
                         <RadzenText>@displayedtext</RadzenText>
                         <a href="https://store.steampowered.com/news/app/394360" target="_blank" class="rz-button rz-primary">View Full News</a>
                     </RadzenStack>
@@ -30,11 +33,11 @@ else
     </div>
 }
 
-@code 
+@code
 {
-    private Root root;
-    private string displayedtext;
-    private string fulltext;
+    private Root? root;
+    private string? displayedtext;
+    private string? fulltext;
 
     private void RedirectToHoi4News()
     {
@@ -62,7 +65,10 @@ else
                 }
                 this.root = root;
                 fulltext = root.appnews.newsitems[0].contents;
-                displayedtext = fulltext.Length > 300 ? fulltext.Substring(0, 300) + "..." : fulltext;
+                if (fulltext != null)
+                {
+                    displayedtext = fulltext.Length > 300 ? fulltext.Substring(0, 300) + "..." : fulltext;
+                }
             }
             else
             {

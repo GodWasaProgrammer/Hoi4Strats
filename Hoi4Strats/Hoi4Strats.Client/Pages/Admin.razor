@@ -4,7 +4,7 @@
 @using Microsoft.AspNetCore.Components.Rendering
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
-@using Hoi4Strats.Client.Data
+@using SharedProj
 @inject UserService UService
 @inject NotificationService NotificationService
 @inject DialogService DialogService
@@ -33,7 +33,6 @@
     private List<ApplicationUser> users = new();
     private List<string> roles = new();
     private ApplicationUser? selectedUser;
-    private bool isEditRoleDialogVisible = false;
     private List<string> selectedRoles = new();
     private Dictionary<string, UserRoleDisplay> userRoleDisplayRefs = new Dictionary<string, UserRoleDisplay>();
 
@@ -82,7 +81,6 @@
     {
         selectedUser = user;
         selectedRoles = await UService.GetRolesAsync(user.Id);
-        isEditRoleDialogVisible = true;
     }
 
     private RenderFragment RolesCellTemplate(ApplicationUser user) => builder =>

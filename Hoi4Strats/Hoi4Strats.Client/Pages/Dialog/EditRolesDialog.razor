@@ -1,5 +1,5 @@
 ﻿@page "/edit-roles-dialog"
-@using Hoi4Strats.Client.Data
+@using SharedProj
 @inject DialogService DialogService
 
 <h4>Edit Roles for @SelectedUser?.UserName</h4>
@@ -10,9 +10,9 @@
 
 @code 
 {
-    [Parameter] public ApplicationUser SelectedUser { get; set; }
-    [Parameter] public List<string> SelectedRoles { get; set; } // För valda roller
-    [Parameter] public List<string> Roles { get; set; } // Roller som ska visas i drop-down
+    [Parameter] public ApplicationUser ?SelectedUser { get; set; }
+    [Parameter] public List<string> ?SelectedRoles { get; set; } // För valda roller
+    [Parameter] public List<string> ?Roles { get; set; } // Roller som ska visas i drop-down
 
     private void SaveChanges()
     {
