@@ -5,11 +5,8 @@ using Hoi4Strats.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Radzen;
 using SharedProj;
-using SharedProj.DBModels;
-using SharedProj.newsitems;
 using System.Net;
 
 namespace Hoi4Strats;
@@ -82,73 +79,22 @@ public class Program
 
         app.MapAdditionalIdentityEndpoints();
         app.UseRouting();
-        app.UseAntiforgery();
         app.MapControllers();
         app.UseAuthentication();
+        app.UseAntiforgery();
         app.UseAuthorization();
-
-        // Custom endpoints
-        app.MapGet("/get-guides", async (DBService dbService) =>
-        {
-            var guides = await dbService.GetGuides();
-            return Results.Ok(guides);
-        });
-
-        app.MapPost("/create-guide", async (GuideModel guide, DBService dbService) =>
-        {
-            await dbService.CreateGuide(guide);
-            return Results.Ok("Guide created successfully");
-        });
-
-        app.MapPost("/upload/image", async (HttpRequest request) =>
-        {
-            var form = await request.ReadFormAsync();
-            IFormFile? file = form.Files.FirstOrDefault();
-            if (file != null)
-            {
-                var filePath = Path.Combine("wwwroot", "uploads", file.FileName);
-                Directory.CreateDirectory(Path.Combine("wwwroot", "uploads"));
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-                var fileUrl = $"/uploads/{file.FileName}";
-                return Results.Ok(new { Url = fileUrl });
-            }
-            return Results.BadRequest("Ingen fil uppladdad.");
-        });
-
-        app.MapPost("/get-hoi4-news", async () =>
-        {
-            var steamapi = new SteamApiClient();
-            var json = await steamapi.GetNewsForHeartsOfIronAsync();
-            var news = JsonConvert.DeserializeObject<Root>(json);
-            return news != null ? Results.Ok(news) : Results.BadRequest("Deserialization failed.");
-        });
-
+        Endpoints.MapGuideEndpoints(app);
+        Endpoints.MapNewsEndpoint(app);
+        Endpoints.MapImageUploadEndpoint(app);
         Tests.TestConnection();
 
         // Ensure roles are created when application starts
         using (var scope = app.Services.CreateScope())
         {
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            await EnsureRolesCreated(roleManager);
+            await Tests.EnsureRolesCreated(roleManager);
         }
 
         await app.RunAsync();
     }
-
-    private static async Task EnsureRolesCreated(RoleManager<IdentityRole> roleManager)
-    {
-        var roles = new[] { "Admin", "User", "Editor", "Moderator", "GuideAdmin", "ForumAdmin" };
-
-        foreach (var role in roles)
-        {
-            if (!await roleManager.RoleExistsAsync(role))
-            {
-                await roleManager.CreateAsync(new IdentityRole(role));
-            }
-        }
-    }
 }
-

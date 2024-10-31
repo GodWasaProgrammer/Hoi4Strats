@@ -5,32 +5,28 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using SharedProj
-@rendermode InteractiveServer
 @inject UserService UService
 @inject NotificationService NotificationService
 @inject DialogService DialogService
 
 <AuthorizeView Roles="Admin">
-<h3>Admin - User Management</h3>
-<RadzenDataGrid TItem="ApplicationUser" Data="@users" RowSelect="OnUserSelect">
-    <Columns>
-        <RadzenDataGridColumn TItem="ApplicationUser" Property="UserName" Title="Username" />
-        <RadzenDataGridColumn TItem="ApplicationUser" Property="Email" Title="Email" />
-        <RadzenDataGridColumn TItem="ApplicationUser" Title="Roles">
-            <Template Context="user">
-                @if(user is not null)
-                {
-                <UserRoleDisplay @ref="userRoleDisplayRefs[user.Id]" UserId="@user.Id"></UserRoleDisplay>
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ApplicationUser" Context="user">
-            <Template>
-                <RadzenButton Text="Edit Roles" Click="@(args => EditRoles(user))" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+    <h3>Admin - User Management</h3>
+    <RadzenDataGrid TItem="ApplicationUser" Data="@users" RowSelect="OnUserSelect">
+        <Columns>
+            <RadzenDataGridColumn TItem="ApplicationUser" Property="UserName" Title="Username" />
+            <RadzenDataGridColumn TItem="ApplicationUser" Property="Email" Title="Email" />
+            <RadzenDataGridColumn TItem="ApplicationUser" Title="Roles">
+                <Template Context="user">
+                    <UserRoleDisplay @ref="userRoleDisplayRefs[user.Id]" UserId="@user.Id"></UserRoleDisplay>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ApplicationUser" Context="user">
+                <Template>
+                    <RadzenButton Text="Edit Roles" Click="@(args => EditRoles(user))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
 </AuthorizeView>
 
 @code
