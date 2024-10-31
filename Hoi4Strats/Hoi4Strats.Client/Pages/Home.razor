@@ -1,10 +1,19 @@
 ﻿@page "/"
-
+@inject AuthenticationStateProvider provider
 <InSiteNewsFeed></InSiteNewsFeed>
 
 
-@code 
+@code
 {
-    
-}
+    protected override async void OnInitialized()
+    {
+        var authState = await provider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
+        // Debug: Se vilka claims användaren har
+        foreach (var claim in user.Claims)
+        {
+            Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
+        }
+    }
+}

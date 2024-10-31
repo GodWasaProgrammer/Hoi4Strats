@@ -21,7 +21,7 @@ internal class Program
             options.Name = "MyApplicationTheme"; // The name of the cookie
             options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
         });
-        builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
+        builder.Services.AddScoped<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
 
         await builder.Build().RunAsync();
     }

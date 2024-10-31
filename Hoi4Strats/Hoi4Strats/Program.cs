@@ -84,6 +84,8 @@ public class Program
         app.UseRouting();
         app.UseAntiforgery();
         app.MapControllers();
+        app.UseAuthentication();
+        app.UseAuthorization();
 
         // Custom endpoints
         app.MapGet("/get-guides", async (DBService dbService) =>

@@ -2,6 +2,7 @@
 
 @inject NavigationManager NavigationManager
 @using Hoi4Strats.Client
+@inject AuthenticationStateProvider prov
 @inherits LayoutComponentBase
 @layout MainLayout
 
@@ -167,15 +168,20 @@
     </RadzenPanelMenu>
     <RadzenPanelMenu>
         <RadzenPanelMenuItem Path="/Account/Login" Text="Login" />
-        <AuthorizeView Roles="Admin">
-            <RadzenPanelMenuItem Path="/Admin" Text="AdminPanel" />
-        </AuthorizeView>
+        @if (!IsLoading)
+        {
+            @if (IsAdmin)
+            {
+                <RadzenPanelMenuItem Path="/Admin" Text="AdminPanel" />
+            }
+        }
         <AuthorizeView>
+
             <RadzenPanelMenuItem Path="/CreateGuide" Text="Create Guide" />
             <RadzenPanelMenuItem Path="/Inspector" Text="Review submissions" />
         </AuthorizeView>
     </RadzenPanelMenu>
-    <Hoi4Strats.Client.Pages.ExtNewsFeed/>
+    <Hoi4Strats.Client.Pages.ExtNewsFeed />
 </RadzenSidebar>
 
 @code {
@@ -185,6 +191,17 @@
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private bool IsAdmin { get; set; }
+    private bool IsLoading { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await prov.GetAuthenticationStateAsync();
+        IsAdmin = authState.User.IsInRole("Admin");
+        Console.WriteLine(IsAdmin);
+        IsLoading = false;
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
@@ -198,4 +215,3 @@
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
 }
-
