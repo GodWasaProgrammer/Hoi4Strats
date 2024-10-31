@@ -18,7 +18,10 @@
         <RadzenDataGridColumn TItem="ApplicationUser" Property="Email" Title="Email" />
         <RadzenDataGridColumn TItem="ApplicationUser" Title="Roles">
             <Template Context="user">
+                @if(user is not null)
+                {
                 <UserRoleDisplay @ref="userRoleDisplayRefs[user.Id]" UserId="@user.Id"></UserRoleDisplay>
+                }
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ApplicationUser" Context="user">
