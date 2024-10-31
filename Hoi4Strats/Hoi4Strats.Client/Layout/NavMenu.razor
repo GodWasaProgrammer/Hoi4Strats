@@ -167,13 +167,9 @@
     </RadzenPanelMenu>
     <RadzenPanelMenu>
         <RadzenPanelMenuItem Path="/Account/Login" Text="Login" />
-        @if (!IsLoading)
-        {
-            @if (IsAdmin)
-            {
+<AuthorizeView Roles="Admin">
                 <RadzenPanelMenuItem Path="/Admin" Text="AdminPanel" />
-            }
-        }
+</AuthorizeView>
         <AuthorizeView>
 
             <RadzenPanelMenuItem Path="/CreateGuide" Text="Create Guide" />

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Hoi4Strats.Migrations
 {
     /// <inheritdoc />
-    public partial class Hoi4StratsIdentityWithRoles : Migration
+    public partial class Hoi4StratsUserDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

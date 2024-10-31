@@ -19,9 +19,7 @@ namespace Hoi4Strats.Components.Account
         private readonly IServiceScopeFactory scopeFactory;
         private readonly PersistentComponentState state;
         private readonly IdentityOptions options;
-
         private readonly PersistingComponentStateSubscription subscription;
-
         private Task<AuthenticationState>? authenticationStateTask;
 
         public PersistingRevalidatingAuthenticationStateProvider(
@@ -44,7 +42,6 @@ namespace Hoi4Strats.Components.Account
         protected override async Task<bool> ValidateAuthenticationStateAsync(
             AuthenticationState authenticationState, CancellationToken cancellationToken)
         {
-            // Get the user manager from a new scope to ensure it fetches fresh data
             await using var scope = scopeFactory.CreateAsyncScope();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             return await ValidateSecurityStampAsync(userManager, authenticationState.User);
@@ -91,11 +88,21 @@ namespace Hoi4Strats.Components.Account
 
                 if (userId != null && email != null)
                 {
-                    state.PersistAsJson(nameof(UserInfo), new UserInfo
+                    await using var scope = scopeFactory.CreateAsyncScope();
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                    var user = await userManager.FindByIdAsync(userId);
+
+                    if (user != null)
                     {
-                        UserId = userId,
-                        Email = email,
-                    });
+                        var roles = await userManager.GetRolesAsync(user);
+
+                        state.PersistAsJson(nameof(UserInfo), new UserInfo
+                        {
+                            UserId = userId,
+                            Email = email,
+                            Roles = roles.ToList()
+                        });
+                    }
                 }
             }
         }

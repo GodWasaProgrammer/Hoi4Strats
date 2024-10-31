@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Hoi4Strats.Client\Hoi4Strats.Client.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
