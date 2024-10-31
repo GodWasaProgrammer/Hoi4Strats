@@ -51,7 +51,7 @@ else
         if (response.IsSuccessStatusCode)
         {
             string json = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(json); // Logga JSON för debugging
+            // Console.WriteLine(json); // Logga JSON för debugging
 
             // Deserialisera JSON med System.Text.Json
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
@@ -61,7 +61,7 @@ else
             {
                 foreach (var newsItem in root.appnews.newsitems)
                 {
-                    Console.WriteLine($"Title: {newsItem.title}, URL: {newsItem.url}");
+                    // Console.WriteLine($"Title: {newsItem.title}, URL: {newsItem.url}");
                 }
                 this.root = root;
                 fulltext = root.appnews.newsitems[0].contents;

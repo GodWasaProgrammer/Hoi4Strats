@@ -9,8 +9,8 @@
 @inject NotificationService NotificationService
 @inject DialogService DialogService
 
+<AuthorizeView Roles="Admin">
 <h3>Admin - User Management</h3>
-
 <RadzenDataGrid TItem="ApplicationUser" Data="@users" RowSelect="OnUserSelect">
     <Columns>
         <RadzenDataGridColumn TItem="ApplicationUser" Property="UserName" Title="Username" />
@@ -27,6 +27,7 @@
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
+</AuthorizeView>
 
 @code
 {
@@ -82,12 +83,4 @@
         selectedUser = user;
         selectedRoles = await UService.GetRolesAsync(user.Id);
     }
-
-    private RenderFragment RolesCellTemplate(ApplicationUser user) => builder =>
-    {
-        builder.OpenComponent<UserRoleDisplay>(0);
-        builder.AddAttribute(1, "UserId", user.Id);
-        builder.CloseComponent();
-    };
-
 }

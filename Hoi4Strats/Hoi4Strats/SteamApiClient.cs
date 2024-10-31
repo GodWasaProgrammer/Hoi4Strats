@@ -28,8 +28,8 @@ public class SteamApiClient
             var jsonResponse = await response.Content.ReadAsStringAsync();
             var jsonResponse2 = await response.Content.ReadAsStringAsync();
             var jsonResponse3 = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"API Response: {jsonResponse}");
-            Console.WriteLine(jsonResponse2);
+            //Console.WriteLine($"API Response: {jsonResponse}");
+            //Console.WriteLine(jsonResponse2);
             // Returnera svar som sträng
             return await response.Content.ReadAsStringAsync();
         }
