@@ -1,9 +1,9 @@
 ﻿namespace Hoi4Strats.Controllers;
 
-using Hoi4Strats.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SharedProj;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

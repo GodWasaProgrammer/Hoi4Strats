@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hoi4Strats", "Hoi4Strats\Ho
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hoi4Strats.Client", "Hoi4Strats\Hoi4Strats.Client\Hoi4Strats.Client.csproj", "{3981CBC7-47DC-4507-92CA-D55E317348E1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{EAB9F1B7-FFEF-4573-A6A8-073E30F2DDF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedProj", "Shared\SharedProj.csproj", "{EAB9F1B7-FFEF-4573-A6A8-073E30F2DDF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

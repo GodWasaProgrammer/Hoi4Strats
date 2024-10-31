@@ -1,5 +1,5 @@
-using Hoi4Strats.Data;
 using Microsoft.AspNetCore.Identity;
+using SharedProj;
 
 namespace Hoi4Strats.Components.Account
 {

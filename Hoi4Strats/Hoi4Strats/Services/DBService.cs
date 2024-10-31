@@ -1,5 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
-using Shared.DBModels;
+using SharedProj.DBModels;
 using System.Data;
 
 namespace Hoi4Strats;

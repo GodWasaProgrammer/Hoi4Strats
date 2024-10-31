@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared.DBModels
+namespace SharedProj.DBModels
 {
     public class ForumUserModel
     {

@@ -1,4 +1,4 @@
-﻿namespace Shared.DBModels;
+﻿namespace SharedProj.DBModels;
 
 public class ForumPostModel
 {

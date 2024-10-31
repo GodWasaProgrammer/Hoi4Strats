@@ -1,4 +1,4 @@
-﻿namespace Shared.newsitems
+﻿namespace SharedProj.newsitems
 {
     public class Appnews
     {

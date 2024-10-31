@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Radzen;
-using Shared.DBModels;
-using Shared.newsitems;
+using SharedProj;
+using SharedProj.DBModels;
+using SharedProj.newsitems;
 using System.Net;
 
 namespace Hoi4Strats;
