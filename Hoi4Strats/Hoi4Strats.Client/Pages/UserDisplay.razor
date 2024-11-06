@@ -1,0 +1,86 @@
+﻿@using Hoi4Strats.Client.Services
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthProvider;
+@inject NavigationManager NavMan;
+@inject HttpClient client;
+
+@if (_user is null)
+{
+    <RadzenButton Click="Login">Login</RadzenButton>
+}
+
+@if (_user != null)
+{
+    <h3>Hello <RadzenButton Click="EditUser">@_user</RadzenButton></h3>
+    @if (_userID != null)
+    {
+        <h3>Your Roles:<UserRoleDisplay UserId="@_userID" /></h3>
+    }
+
+    <RadzenButton Click="LogOut">Logout</RadzenButton>
+
+    @* <div class="nav-item px-3">
+        <form action="Account/Logout" method="post">
+            <AntiforgeryToken />
+            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+            <button type="submit" class="nav-link">
+                <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+            </button>
+        </form>
+    </div> *@
+
+}
+@code
+{
+    private string? _user;
+    private string? _userID;
+    private Task<AuthenticationState>? Auth;
+    private string currentUrl = "";
+
+    private async Task LogOut()
+    {
+        // Använd HttpClient för att logga ut via servern
+        var result = await client.PostAsync("/Account/Logout", null);
+
+        if (result.IsSuccessStatusCode)
+        {
+            // Navigera efter utloggning
+            NavMan.NavigateTo("/login");
+        }
+    }
+
+    private void Login()
+    {
+        NavMan.NavigateTo("/Account/Manage", true);
+    }
+
+    private void EditUser()
+    {
+        NavMan.NavigateTo("/Account/Manage", true);
+    }
+
+    protected override void OnInitialized()
+    {
+        Auth = AuthProvider.GetAuthenticationStateAsync();
+        var User = Auth.Result.User;
+
+        if (Auth != null)
+        {
+            if (Auth.Result != null)
+            {
+                if (Auth.Result.User != null)
+                {
+                    var userID = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                    _userID = userID;
+                    if (Auth.Result.User.Identity != null)
+                    {
+                        if (Auth.Result.User.Identity.Name != null)
+                        {
+                            _user = Auth.Result.User.Identity.Name;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

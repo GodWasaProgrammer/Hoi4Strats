@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SharedProj.DBModels;
 using SharedProj.newsitems;
 
 namespace Hoi4Strats
 {
-    // Extensions/EndpointExtensions.cs
     public static class Endpoints
     {
         public static void MapGuideEndpoints(this WebApplication app)
@@ -54,5 +55,4 @@ namespace Hoi4Strats
             });
         }
     }
-
 }

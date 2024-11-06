@@ -71,7 +71,6 @@ public class Program
         }
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-        app.UseAntiforgery();
         app.MapRazorComponents<App>()
            .AddInteractiveServerRenderMode()
            .AddInteractiveWebAssemblyRenderMode()
@@ -81,8 +80,8 @@ public class Program
         app.UseRouting();
         app.MapControllers();
         app.UseAuthentication();
-        app.UseAntiforgery();
         app.UseAuthorization();
+        app.UseAntiforgery();
         Endpoints.MapGuideEndpoints(app);
         Endpoints.MapNewsEndpoint(app);
         Endpoints.MapImageUploadEndpoint(app);
