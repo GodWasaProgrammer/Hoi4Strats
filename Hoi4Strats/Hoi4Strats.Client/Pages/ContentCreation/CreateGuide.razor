@@ -2,7 +2,6 @@
 @using SharedProj.DBModels
 @using SharedProj
 @using System
-@using Microsoft.JSInterop
 @using System.Collections.Generic
 @using System.Text
 @using System.Threading.Tasks
@@ -12,44 +11,62 @@
 @inject HttpClient client;
 <h3>Create Guide</h3>
 
+<RadzenStack>
+    <RadzenLabel Text="Select Guide Type" />
+    <RadzenDropDown TValue="GuideTypes"
+                    Value="@typeOfGuide"
+                    Data="@Enum.GetValues(typeof(GuideTypes))"
+                    Change="@(args => typeOfGuide = (GuideTypes)args)"
+                    Style="width: 100%; max-width: 400px;"
+                    Name="GuideTypeDropdown" />
+</RadzenStack>
+
+<p>Selected Guide Type: @typeOfGuide</p>
+
+@if (typeOfGuide == GuideTypes.LandTemplate)
+{
+    <RadzenStack>
+        <RadzenLabel Text="Select Land Template type" />
+        <RadzenDropDown TValue="LandTemplate"
+                        Value="@landTemplate"
+                        Data="@Enum.GetValues(typeof(LandTemplate))"
+                        Change="@(args => landTemplate = (LandTemplate)args)"
+                        Style="width: 100%; max-width: 400px;"
+                        Name="LandTemplateDropdown" />
+    </RadzenStack>
+}
+@* @if (selectedGuide == "Land Template")
+{
+    <RadzenStack>
+        <RadzenLabel Text="Select Value" Component="DropDownChangeEvent" />
+        <RadzenDropDown Value="@selectedGuide" TValue="enum" Data="@Landtemplate" Change="@(args => selectedGuide = $"{args}")" Style="width: 100%; max-width: 400px;" Name="DropDownChangeEvent"></RadzenDropDown>
+    </RadzenStack>
+} *@
 @if (Title == "")
 {
     <RadzenTextBox Placeholder="Title?" @bind-Value="@Title"></RadzenTextBox>
 }
-
-@if (Title != "")
-{
-    @if (selectedGuide == "Select Guide Type")
+<RadzenStack>
+    @if (Title != "")
     {
-        <RadzenStack>
-            <RadzenLabel Text="Select Value" Component="DropDownChangeEvent" />
-            <RadzenDropDown Value="@selectedGuide" TValue="string" Data="@Guides" Change="@(args => selectedGuide = $"{args}")" Style="width: 100%; max-width: 400px;" Name="DropDownChangeEvent"></RadzenDropDown>
-        </RadzenStack>
-
+        <RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput
+                          Change=@OnChange
+                          Paste=@OnPaste
+                          UploadComplete=@OnUploadComplete
+                          Execute=@OnExecute
+                          UploadUrl="upload/image" />
+        //<EventConsole @ref=@console />
+        <RadzenButton Click="(() => SubmitGuide())">Submit for review</RadzenButton>
     }
-    <RadzenStack>
-        @if (selectedGuide != "Select Guide Type")
-        {
-            <RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput
-                              Change=@OnChange
-                              Paste=@OnPaste
-                              UploadComplete=@OnUploadComplete
-                              Execute=@OnExecute
-                              UploadUrl="upload/image" />
-            //<EventConsole @ref=@console />
-            <RadzenButton Click="(() => SubmitGuide())">Submit for review</RadzenButton>
-        }
-    </RadzenStack>
-
-}
+</RadzenStack>
 
 
 @code
 {
     string Title = "";
-
     string htmlValue = @"<h2 style=""text-align:center"">Din guide här</h2>";
-
+    private GuideTypes typeOfGuide = GuideTypes.Select;
+    private LandTemplate landTemplate = LandTemplate.Infantry;
     void OnPaste(HtmlEditorPasteEventArgs args)
     {
         Console.WriteLine($"Paste: {args.Html}");
@@ -76,14 +93,10 @@
     }
 
 
-    string selectedGuide = "Select Guide Type";
-    IEnumerable<string>? Guides;
-    Lists lists = new();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        Guides = lists.Guidetypes;
     }
 
     private async Task SubmitGuide()
