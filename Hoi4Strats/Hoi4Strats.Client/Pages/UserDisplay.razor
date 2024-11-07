@@ -2,31 +2,55 @@
 @using System.Security.Claims
 @inject AuthenticationStateProvider AuthProvider;
 @inject NavigationManager NavMan;
-@inject HttpClient client;
-@inject IJSRuntime JS;
 
-@if (_user is null)
-{
-    <RadzenButton Click="Login">Login</RadzenButton>
-}
-
-@if (_user != null)
-{
-    <h3>Hello <RadzenButton Click="EditUser">@_user</RadzenButton></h3>
-    @if (_userID != null)
-    {
-        <h3>Your Roles:<UserRoleDisplay UserId="@_userID" /></h3>
-    }
-    <RadzenButton Click="LogOut">LogOut</RadzenButton>
-}
-
+<AuthorizeView>
+    <NotAuthorized>
+        @if (_user is null)
+        {
+            <RadzenButton Click="Login">Login</RadzenButton>
+        }
+    </NotAuthorized>
+    <Authorized>
+        @if (_user != null)
+        {
+            @if (_userID != null)
+            {
+                <h3>Roles:<UserRoleDisplay UserId="@_userID" /></h3>
+            }
+            <RadzenButton Click="LogOut">LogOut</RadzenButton>
+            <RadzenButton Click="EditUser">@_user</RadzenButton>
+        }
+    </Authorized>
+</AuthorizeView>
+<AuthorizeView Roles="Admin">
+    <RadzenButton Click="AdminPanel" Text="AdminPanel" />
+</AuthorizeView>
+<AuthorizeView Roles="Editor">
+    <RadzenButton Click="CreateGuide" Text="Create Guide"/>
+</AuthorizeView>
+<AuthorizeView Roles="GuideAdmin">
+    <RadzenButton Click="InspectGuide" Text="Inspect Guides"/>
+</AuthorizeView>
 @code
 {
     private string? _user;
     private string? _userID;
     private Task<AuthenticationState>? Auth;
-    private string currentUrl = "";
-    private bool _logOut;
+
+    private void InspectGuide()
+    {
+        NavMan.NavigateTo("/Inspector");
+    }
+
+    private void CreateGuide()
+    {
+        NavMan.NavigateTo("/CreateGuide");
+    }
+
+    private void AdminPanel()
+    {
+        NavMan.NavigateTo("/Admin", true);
+    }
 
     private void LogOut()
     {
@@ -35,7 +59,7 @@
 
     private void Login()
     {
-        NavMan.NavigateTo("/Account/Manage", true);
+        NavMan.NavigateTo("/Account/Login", true);
     }
 
     private void EditUser()
@@ -43,10 +67,10 @@
         NavMan.NavigateTo("/Account/Manage", true);
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Auth = AuthProvider.GetAuthenticationStateAsync();
-        var User = Auth.Result.User;
+        await (Auth = AuthProvider.GetAuthenticationStateAsync());
+        var _User = Auth.Result.User;
 
         if (Auth != null)
         {
@@ -54,7 +78,7 @@
             {
                 if (Auth.Result.User != null)
                 {
-                    var userID = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                    var userID = _User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
                     _userID = userID;
                     if (Auth.Result.User.Identity != null)
                     {
@@ -68,4 +92,3 @@
         }
     }
 }
-<script src=""</script>

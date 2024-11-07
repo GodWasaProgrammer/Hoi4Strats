@@ -165,17 +165,6 @@
         </RadzenPanelMenuItem>
         <RadzenPanelMenuItem Path="/Forum" Text="Forum" />
     </RadzenPanelMenu>
-    <RadzenPanelMenu>
-        <RadzenPanelMenuItem Path="/Account/Login" Text="Login" />
-<AuthorizeView Roles="Admin">
-                <RadzenPanelMenuItem Path="/Admin" Text="AdminPanel" />
-</AuthorizeView>
-        <AuthorizeView>
-
-            <RadzenPanelMenuItem Path="/CreateGuide" Text="Create Guide" />
-            <RadzenPanelMenuItem Path="/Inspector" Text="Review submissions" />
-        </AuthorizeView>
-    </RadzenPanelMenu>
     <Hoi4Strats.Client.Pages.ExtNewsFeed />
 </RadzenSidebar>
 
