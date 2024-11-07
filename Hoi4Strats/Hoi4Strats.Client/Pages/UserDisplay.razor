@@ -3,6 +3,7 @@
 @inject AuthenticationStateProvider AuthProvider;
 @inject NavigationManager NavMan;
 @inject HttpClient client;
+@inject IJSRuntime JS;
 
 @if (_user is null)
 {
@@ -16,37 +17,20 @@
     {
         <h3>Your Roles:<UserRoleDisplay UserId="@_userID" /></h3>
     }
-
-    <RadzenButton Click="LogOut">Logout</RadzenButton>
-
-    @* <div class="nav-item px-3">
-        <form action="Account/Logout" method="post">
-            <AntiforgeryToken />
-            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-            <button type="submit" class="nav-link">
-                <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-            </button>
-        </form>
-    </div> *@
-
+    <RadzenButton Click="LogOut">LogOut</RadzenButton>
 }
+
 @code
 {
     private string? _user;
     private string? _userID;
     private Task<AuthenticationState>? Auth;
     private string currentUrl = "";
+    private bool _logOut;
 
-    private async Task LogOut()
+    private void LogOut()
     {
-        // Använd HttpClient för att logga ut via servern
-        var result = await client.PostAsync("/Account/Logout", null);
-
-        if (result.IsSuccessStatusCode)
-        {
-            // Navigera efter utloggning
-            NavMan.NavigateTo("/login");
-        }
+        NavMan.NavigateTo("/LogOut", true);
     }
 
     private void Login()
@@ -84,3 +68,4 @@
         }
     }
 }
+<script src=""</script>
