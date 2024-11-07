@@ -1,6 +1,6 @@
 ﻿namespace SharedProj.DBModels;
 
-public class GuideModel
+public class CountryGuideModel
 {
     public required int Id { get; set; } // Primärnyckel
     public required string Title { get; set; } // Guidens titel

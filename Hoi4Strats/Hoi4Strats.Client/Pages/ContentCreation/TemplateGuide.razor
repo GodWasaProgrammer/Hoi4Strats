@@ -1,4 +1,6 @@
 ﻿@using SharedProj
+@using SharedProj.DBModels
+@inject HttpClient client
 <h3>Template Guide Creator</h3>
 
 @if (typeOfGuide == GuideTypes.LandTemplate)
@@ -39,12 +41,46 @@
                         Name="LandTemplateDropdown" />
     </RadzenStack>
 }
+@if (typeOfGuide == GuideTypes.AirTemplate || typeOfGuide == GuideTypes.LandTemplate || typeOfGuide == GuideTypes.NavalTemplate)
+{
+    <PictureUpload Fetchupload="HandleFileUploaded" />
+    <RadzenTextArea Value="@explanationText" Style="width:200px" Placeholder="Short Explanatory text"/>
+    
+    @if (explanationText != null && picture != "")
+    {
+        <RadzenButton Click="SubmitTemplateGuide" Style="width:200px" Text="submit for inspection" />
+    }
+}
 
-@code 
+@code
 {
     [Parameter]
     public GuideTypes typeOfGuide { get; set; }
     private LandTemplate landTemplate = LandTemplate.Infantry;
     private AirTemplate airTemplate = AirTemplate.Fighter;
     private NavalTemplate navalTemplate = NavalTemplate.Destroyer;
+    private string ?explanationText { get; set; }
+    private string picture = "";
+
+    private async Task SubmitTemplateGuide()
+    {
+        var newGuide = new TemplateGuideModel
+            {
+                Id = 0,
+                Picture = picture,
+                Content = explanationText,
+                Author = "Author Name",
+                CreatedAt = DateTime.UtcNow
+            };
+
+        var response = await client.PostAsJsonAsync("/create-guide", newGuide);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Console.WriteLine($"Response Content: {responseContent}");
+    }
+
+    // passed into delegate to return our uploaded image
+    private void HandleFileUploaded(string filePath)
+    {
+        picture = filePath;
+    }
 }

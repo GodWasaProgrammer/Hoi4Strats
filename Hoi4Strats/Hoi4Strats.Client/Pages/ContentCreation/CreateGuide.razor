@@ -12,43 +12,44 @@
 <h3>Create Guide</h3>
 
 <RadzenStack>
-    <RadzenLabel Text="Select Guide Type" />
-    <RadzenDropDown TValue="string"
-                    Value="@typeOfGuide.ToString()"
-                    Data="@Enum.GetNames(typeof(GuideTypes))"
-                    Change="@(args => typeOfGuide = Enum.Parse<GuideTypes>(args.ToString()))"
-                    Style="width: 100%; max-width: 400px;"
-                    Name="GuideTypeDropdown" />
-</RadzenStack>
+    <RadzenStack>
+        <RadzenLabel Text="Select Guide Type" />
+        <RadzenDropDown TValue="string"
+                        Value="@typeOfGuide.ToString()"
+                        Data="@Enum.GetNames(typeof(GuideTypes))"
+                        Change="@(args => typeOfGuide = Enum.Parse<GuideTypes>(args.ToString()))"
+                        Style="width: 100%; max-width: 400px;"
+                        Name="GuideTypeDropdown" />
+    </RadzenStack>
 
+    <p>Selected Guide Type: @typeOfGuide</p>
 
-<p>Selected Guide Type: @typeOfGuide</p>
-
-@if(typeOfGuide == GuideTypes.LandTemplate || typeOfGuide == GuideTypes.AirTemplate || typeOfGuide == GuideTypes.NavalTemplate)
-{
-    <TemplateGuide typeOfGuide="typeOfGuide"/>
-}
-
-
-@if (Title == "")
-{
-    <RadzenTextBox Placeholder="Title?" @bind-Value="@Title"></RadzenTextBox>
-}
-
-<RadzenStack>
-    @if (Title != "")
+    @if (typeOfGuide == GuideTypes.LandTemplate || typeOfGuide == GuideTypes.AirTemplate || typeOfGuide == GuideTypes.NavalTemplate)
     {
-        <RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput
-                          Change=@OnChange
-                          Paste=@OnPaste
-                          UploadComplete=@OnUploadComplete
-                          Execute=@OnExecute
-                          UploadUrl="upload/image" />
-        //<EventConsole @ref=@console />
-        <RadzenButton Click="(() => SubmitGuide())">Submit for review</RadzenButton>
+        <TemplateGuide typeOfGuide="typeOfGuide" />
     }
-</RadzenStack>
 
+    <RadzenStack>
+        @if (typeOfGuide == GuideTypes.Country)
+        {
+            @if (Title == "")
+            {
+                <RadzenTextBox Style="width:200px" Placeholder="Title?" @bind-Value="@Title"></RadzenTextBox>
+            }
+            @if (Title != "")
+            {
+                <RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput
+                                  Change=@OnChange
+                                  Paste=@OnPaste
+                                  UploadComplete=@OnUploadComplete
+                                  Execute=@OnExecute
+                                  UploadUrl="upload/image" />
+                //<EventConsole @ref=@console />
+                <RadzenButton Click="(() => SubmitGuide())">Submit for review</RadzenButton>
+            }
+        }
+    </RadzenStack>
+</RadzenStack>
 
 @code
 {
@@ -83,8 +84,6 @@
         Console.WriteLine($"Upload complete: {args.RawResponse}");
     }
 
-
-
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -92,7 +91,7 @@
 
     private async Task SubmitGuide()
     {
-        var newGuide = new GuideModel
+        var newGuide = new CountryGuideModel
             {
                 Id = 0,
                 Title = Title,

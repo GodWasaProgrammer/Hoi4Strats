@@ -1,0 +1,59 @@
+﻿@page "/upload-image"
+@using SharedProj
+@inject HttpClient HttpClient
+
+<h3>Upload a picture</h3>
+
+<InputFile OnChange="OnFileSelected" />
+<p>@statusMessage</p>
+
+@code 
+{
+    private string? statusMessage;
+    private IBrowserFile? selectedFile;
+    private string Upload = "";
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        await UploadImage();
+    }
+
+    [Parameter]
+    public EventCallback<string> Fetchupload { get; set; }
+
+
+    private async Task UploadImage()
+    {
+        if (selectedFile is null)
+        {
+            statusMessage = "Ingen fil vald.";
+            return;
+        }
+
+        try
+        {
+            var content = new MultipartFormDataContent();
+            var fileContent = new StreamContent(selectedFile.OpenReadStream());
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
+            content.Add(fileContent, "file", selectedFile.Name);
+
+            var response = await HttpClient.PostAsync("upload/image", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<UploadResponse>();
+                statusMessage = $"Bild uppladdad! URL: {result?.Url}";
+                await Fetchupload.InvokeAsync(result.Url);
+            }
+            else
+            {
+                statusMessage = "Uppladdning misslyckades.";
+            }
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Fel: {ex.Message}";
+        }
+    }
+}
