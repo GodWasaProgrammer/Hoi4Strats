@@ -13,39 +13,28 @@
 
 <RadzenStack>
     <RadzenLabel Text="Select Guide Type" />
-    <RadzenDropDown TValue="GuideTypes"
-                    Value="@typeOfGuide"
-                    Data="@Enum.GetValues(typeof(GuideTypes))"
-                    Change="@(args => typeOfGuide = (GuideTypes)args)"
+    <RadzenDropDown TValue="string"
+                    Value="@typeOfGuide.ToString()"
+                    Data="@Enum.GetNames(typeof(GuideTypes))"
+                    Change="@(args => typeOfGuide = Enum.Parse<GuideTypes>(args.ToString()))"
                     Style="width: 100%; max-width: 400px;"
                     Name="GuideTypeDropdown" />
 </RadzenStack>
 
+
 <p>Selected Guide Type: @typeOfGuide</p>
 
-@if (typeOfGuide == GuideTypes.LandTemplate)
+@if(typeOfGuide == GuideTypes.LandTemplate || typeOfGuide == GuideTypes.AirTemplate || typeOfGuide == GuideTypes.NavalTemplate)
 {
-    <RadzenStack>
-        <RadzenLabel Text="Select Land Template type" />
-        <RadzenDropDown TValue="LandTemplate"
-                        Value="@landTemplate"
-                        Data="@Enum.GetValues(typeof(LandTemplate))"
-                        Change="@(args => landTemplate = (LandTemplate)args)"
-                        Style="width: 100%; max-width: 400px;"
-                        Name="LandTemplateDropdown" />
-    </RadzenStack>
+    <TemplateGuide typeOfGuide="typeOfGuide"/>
 }
-@* @if (selectedGuide == "Land Template")
-{
-    <RadzenStack>
-        <RadzenLabel Text="Select Value" Component="DropDownChangeEvent" />
-        <RadzenDropDown Value="@selectedGuide" TValue="enum" Data="@Landtemplate" Change="@(args => selectedGuide = $"{args}")" Style="width: 100%; max-width: 400px;" Name="DropDownChangeEvent"></RadzenDropDown>
-    </RadzenStack>
-} *@
+
+
 @if (Title == "")
 {
     <RadzenTextBox Placeholder="Title?" @bind-Value="@Title"></RadzenTextBox>
 }
+
 <RadzenStack>
     @if (Title != "")
     {
@@ -67,6 +56,8 @@
     string htmlValue = @"<h2 style=""text-align:center"">Din guide här</h2>";
     private GuideTypes typeOfGuide = GuideTypes.Select;
     private LandTemplate landTemplate = LandTemplate.Infantry;
+
+
     void OnPaste(HtmlEditorPasteEventArgs args)
     {
         Console.WriteLine($"Paste: {args.Html}");
