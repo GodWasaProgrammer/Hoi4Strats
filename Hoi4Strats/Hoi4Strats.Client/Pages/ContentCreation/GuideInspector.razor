@@ -1,8 +1,42 @@
 ﻿@page "/Inspector"
+@using SharedProj.DBModels
 
 <h3>GuideInspector</h3>
 
-@code 
-{
+<h2>This is where Guide Administrator approve Guides/Templates</h2>
 
+<RadzenDataGrid TItem="CountryGuideModel" Data="@CountryGuidesToInspect">
+    <RadzenDataGridColumn TItem="CountryGuideModel" Property="Content" Title="Title"></RadzenDataGridColumn>
+</RadzenDataGrid>
+
+<RadzenDataGrid TItem="TemplateGuideModel" Data="TemplatesToInspect">
+    <RadzenDataGridColumn TItem="TemplateGuideModel" Property="Author" Title="Title"></RadzenDataGridColumn>
+    <RadzenDataGridColumn TItem="TemplateGuideModel" Property="CreatedAt"></RadzenDataGridColumn>
+    <RadzenDataGridColumn TItem="TemplateGuideModel" Property="Picture"></RadzenDataGridColumn>
+</RadzenDataGrid>
+
+
+@code
+{
+    List<CountryGuideModel> CountryGuidesToInspect = new();
+    List<TemplateGuideModel> TemplatesToInspect = new();
+
+    TemplateGuideModel dummyGuide = new TemplateGuideModel
+        {
+            Id = 1,
+            Content = "Det här är ett exempel på innehåll för en guide.",
+            Author = "Test Författare",
+            Picture = "dummy-image-url.jpg",
+            CreatedAt = DateTime.Now
+        };
+
+    protected override void OnInitialized()
+    {
+        TemplatesToInspect.Add(dummyGuide);
+        TemplatesToInspect.Add(dummyGuide);
+        TemplatesToInspect.Add(dummyGuide);
+        TemplatesToInspect.Add(dummyGuide);
+        TemplatesToInspect.Add(dummyGuide);
+        TemplatesToInspect.Add(dummyGuide);
+    }
 }

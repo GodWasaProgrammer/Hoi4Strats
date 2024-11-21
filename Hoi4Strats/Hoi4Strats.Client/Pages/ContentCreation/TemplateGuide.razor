@@ -59,7 +59,7 @@
     private LandTemplate landTemplate = LandTemplate.Infantry;
     private AirTemplate airTemplate = AirTemplate.Fighter;
     private NavalTemplate navalTemplate = NavalTemplate.Destroyer;
-    private string ?explanationText { get; set; }
+    private string? explanationText { get; set; } = "";
     private string picture = "";
 
     private async Task SubmitTemplateGuide()
@@ -73,7 +73,7 @@
                 CreatedAt = DateTime.UtcNow
             };
 
-        var response = await client.PostAsJsonAsync("/create-guide", newGuide);
+        var response = await client.PostAsJsonAsync("/create-template-guide", newGuide);
         var responseContent = await response.Content.ReadAsStringAsync();
         Console.WriteLine($"Response Content: {responseContent}");
     }

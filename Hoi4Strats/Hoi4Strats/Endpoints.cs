@@ -19,6 +19,12 @@ public static class Endpoints
             await dbService.CreateGuide(guide);
             return Results.Ok("Guide created successfully");
         });
+
+        app.MapPost("/create-template-guide", async (TemplateGuideModel guide, DBService dbService) =>
+        {
+            await dbService.CreateTemplateGuide(guide);
+            return Results.Ok("Template created successfully");
+        });
     }
 
     public static void MapImageUploadEndpoint(this WebApplication app)
