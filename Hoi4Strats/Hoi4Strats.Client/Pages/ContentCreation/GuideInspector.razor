@@ -1,25 +1,43 @@
 ﻿@page "/Inspector"
 @using SharedProj.DBModels
+@using Radzen
 
 <h3>GuideInspector</h3>
 
 <h2>This is where Guide Administrator approve Guides/Templates</h2>
-
-<RadzenDataGrid TItem="CountryGuideModel" Data="@CountryGuidesToInspect">
-    <RadzenDataGridColumn TItem="CountryGuideModel" Property="Content" Title="Title"></RadzenDataGridColumn>
+<div>
+<RadzenText>Templates</RadzenText>
+    <RadzenDataGrid TItem="TemplateGuideModel" Data="@TemplatesToInspect" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="5" RowClick="OnTemplateGuideClicked">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(TemplateGuideModel.Author)" Title="Author"/>
+            <RadzenDataGridColumn Property="@nameof(TemplateGuideModel.CreatedAt)" Title="Created"/>
+    </Columns>
 </RadzenDataGrid>
+</div>
 
-<RadzenDataGrid TItem="TemplateGuideModel" Data="TemplatesToInspect">
-    <RadzenDataGridColumn TItem="TemplateGuideModel" Property="Author" Title="Title"></RadzenDataGridColumn>
-    <RadzenDataGridColumn TItem="TemplateGuideModel" Property="CreatedAt"></RadzenDataGridColumn>
-    <RadzenDataGridColumn TItem="TemplateGuideModel" Property="Picture"></RadzenDataGridColumn>
+<div>
+<RadzenText>Countries</RadzenText>
+<RadzenDataGrid TItem="CountryGuideModel" Data="@CountryGuidesToInspect" AllowPaging="true" PageSize="5" RowClick="OnCountryGuideClicked">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(CountryGuideModel.Title)" Title="Title"/> 
+        <RadzenDataGridColumn Property="@nameof(CountryGuideModel.Author)" Title="Author"/>
+        <RadzenDataGridColumn Property="@nameof(CountryGuideModel.CreatedAt)" Title="Created"/>
+            @* <Template Context="CountryGuide">
+                <div @onclick="() => OnCountryGuideClicked(CountryGuide)" style="cursor: pointer;">
+                    Title:@CountryGuide.Title
+                    By:@CountryGuide.Author
+                    Created:@CountryGuide.CreatedAt
+                </div>
+            </Template> *@
+        
+    </Columns>
 </RadzenDataGrid>
-
+</div>
 
 @code
 {
-    List<CountryGuideModel> CountryGuidesToInspect = new();
-    List<TemplateGuideModel> TemplatesToInspect = new();
+    public List<CountryGuideModel> CountryGuidesToInspect = new();
+    public List<TemplateGuideModel> TemplatesToInspect = new();
 
     TemplateGuideModel dummyGuide = new TemplateGuideModel
         {
@@ -30,13 +48,30 @@
             CreatedAt = DateTime.Now
         };
 
+    CountryGuideModel dummyCountryGuide = new CountryGuideModel
+        {
+            Id = 1,
+            Content = "bla bla",
+            Author = "Sven",
+            CreatedAt = DateTime.Now,
+            Title = "Peak Germany"
+        };
+
     protected override void OnInitialized()
     {
         TemplatesToInspect.Add(dummyGuide);
-        TemplatesToInspect.Add(dummyGuide);
-        TemplatesToInspect.Add(dummyGuide);
-        TemplatesToInspect.Add(dummyGuide);
-        TemplatesToInspect.Add(dummyGuide);
-        TemplatesToInspect.Add(dummyGuide);
+        CountryGuidesToInspect.Add(dummyCountryGuide);
+    }
+    private void OnTemplateGuideClicked(DataGridRowMouseEventArgs<TemplateGuideModel> ClickedGuide)
+    {
+        // Hantera klicket, t.ex. navigera till trådar i den här kategorin
+        Console.WriteLine($"Clicked on Template Guide: {ClickedGuide.Data.Author}");
+        // NavigationManager.NavigateTo($"/forum/category/{category.ID}");
+    }
+    private void OnCountryGuideClicked(DataGridRowMouseEventArgs<CountryGuideModel> ClickedGuide)
+    {
+        // Hantera klicket, t.ex. navigera till trådar i den här kategorin
+        Console.WriteLine($"Clicked on Country Guide: {ClickedGuide.Data.Author}");
+        // NavigationManager.NavigateTo($"/forum/category/{category.ID}");
     }
 }
