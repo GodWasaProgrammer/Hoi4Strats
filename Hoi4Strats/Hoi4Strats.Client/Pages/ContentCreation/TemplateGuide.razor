@@ -64,10 +64,11 @@
 
     private async Task SubmitTemplateGuide()
     {
-        var newGuide = new TemplateGuideModel
+        var newGuide = new GuideModel
             {
                 Id = 0,
-                Picture = picture,
+                Title = "Test",
+                Pictures = new List<string>{$"{picture}"},
                 Content = explanationText,
                 Author = "Author Name",
                 CreatedAt = DateTime.UtcNow

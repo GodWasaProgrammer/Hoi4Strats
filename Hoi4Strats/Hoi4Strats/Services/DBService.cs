@@ -13,7 +13,7 @@ public class DBService
         _connectionString = connectionString;
     }
 
-    public async Task CreateGuide(CountryGuideModel GuideIn)
+    public async Task CreateGuide(GuideModel GuideIn)
     {
         var query = "INSERT INTO Guides (Title, Content, Author, CreatedAt) VALUES (@Title, @Content, @Author, @CreatedAt)";
 
@@ -45,9 +45,9 @@ public class DBService
         }
     }
 
-    public async Task<List<CountryGuideModel>> GetGuides()
+    public async Task<List<GuideModel>> GetGuides()
     {
-        var guides = new List<CountryGuideModel>();
+        var guides = new List<GuideModel>();
         var query = "SELECT Id, Title, Content, Author, CreatedAt FROM Guides";
 
         using (var connection = new SqlConnection(_connectionString))
@@ -59,7 +59,7 @@ public class DBService
             {
                 while (await reader.ReadAsync())
                 {
-                    var guide = new CountryGuideModel
+                    var guide = new GuideModel
                     {
                         Id = reader.GetInt32(0),
                         Title = reader.GetString(1),
@@ -74,7 +74,7 @@ public class DBService
         return guides;
     }
 
-    internal async Task CreateTemplateGuide(TemplateGuideModel guide)
+    internal async Task CreateTemplateGuide(GuideModel guide)
     {
         var query = "INSERT INTO Guides (Title, Content, Author, CreatedAt) VALUES (@Title, @Content, @Author, @CreatedAt)";
 
@@ -86,13 +86,13 @@ public class DBService
 
                 using (var command = new SqlCommand(query, connection))
                 {
-                    // command.Parameters.Add("@Title", SqlDbType.NVarChar).Value = guide.Title;
+                    command.Parameters.Add("@Title", SqlDbType.NVarChar).Value = guide.Title;
                     command.Parameters.Add("@Content", SqlDbType.NVarChar).Value = guide.Content;
                     command.Parameters.Add("@Author", SqlDbType.NVarChar).Value = guide.Author;
                     command.Parameters.Add("@CreatedAt", SqlDbType.DateTime).Value = DateTime.Now;
 
                     await command.ExecuteNonQueryAsync(); // Kör SQL-frågan
-                   // Console.WriteLine($"{guide.Title} written to DB");
+                    Console.WriteLine($"{guide.Title} written to DB");
                     Console.WriteLine($"{guide.Content} written to DB");
                     Console.WriteLine($"{guide.Author} written to DB");
                     Console.WriteLine($"{guide.CreatedAt} written to DB");
