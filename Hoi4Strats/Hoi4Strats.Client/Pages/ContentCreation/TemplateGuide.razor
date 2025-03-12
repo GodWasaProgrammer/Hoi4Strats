@@ -44,8 +44,8 @@
 @if (typeOfGuide == GuideTypes.AirTemplate || typeOfGuide == GuideTypes.LandTemplate || typeOfGuide == GuideTypes.NavalTemplate)
 {
     <PictureUpload Fetchupload="HandleFileUploaded" />
-    <RadzenTextArea Value="@explanationText" Style="width:200px" Placeholder="Short Explanatory text"/>
-    
+    <RadzenTextArea Value="@explanationText" Style="width:200px" Placeholder="Short Explanatory text" />
+
     @if (explanationText != null && picture != "")
     {
         <RadzenButton Click="SubmitTemplateGuide" Style="width:200px" Text="submit for inspection" />
@@ -68,11 +68,17 @@
             {
                 Id = 0,
                 Title = "Test",
-                Pictures = new List<string>{$"{picture}"},
                 Content = explanationText,
                 Author = "Author Name",
                 CreatedAt = DateTime.UtcNow
             };
+
+        var readImgBytes = File.ReadAllBytesAsync(picture);
+        var img = new ImageModel { Content = readImgBytes.Result, ContentType = "png", Name = "test" };
+        if (newGuide.Pictures != null)
+        {
+            newGuide.Pictures.Add(img);
+        }
 
         var response = await client.PostAsJsonAsync("/create-template-guide", newGuide);
         var responseContent = await response.Content.ReadAsStringAsync();

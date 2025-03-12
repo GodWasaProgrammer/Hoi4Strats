@@ -7,5 +7,5 @@ public class GuideModel
     public required string Content { get; set; } // Guidens innehåll
     public required string Author { get; set; } // Namn eller ID för författaren
     public DateTime CreatedAt { get; set; } // När guiden skapades
-    public List<string>? Pictures { get; set; } = [];
+    public List<ImageModel>? Pictures { get; set; } = [];
 }
