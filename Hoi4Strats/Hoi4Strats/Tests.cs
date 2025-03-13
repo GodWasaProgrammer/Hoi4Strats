@@ -2,36 +2,35 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 
-namespace Hoi4Strats
+namespace Hoi4Strats;
+
+public class Tests
 {
-    public class Tests
+    public static void TestConnection()
     {
-        public static void TestConnection()
-        {
-            var connectionString = DButils.GetConnectionString();
+        var connectionString = DButils.GetConnectionString();
 
-            using var connection = new SqlConnection(connectionString);
-            try
-            {
-                connection.Open();
-                Console.WriteLine("SQL Connection test Success!");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Houston, we got a SQL problem: {ex.Message}");
-            }
+        using var connection = new SqlConnection(connectionString);
+        try
+        {
+            connection.Open();
+            Console.WriteLine("SQL Connection test Success!");
         }
-
-        public static async Task EnsureRolesCreated(RoleManager<IdentityRole> roleManager)
+        catch (Exception ex)
         {
-            var roles = new[] { "Admin", "User", "Editor", "Moderator", "GuideAdmin", "ForumAdmin" };
+            Console.WriteLine($"Houston, we got a SQL problem: {ex.Message}");
+        }
+    }
 
-            foreach (var role in roles)
+    public static async Task EnsureRolesCreated(RoleManager<IdentityRole> roleManager)
+    {
+        var roles = new[] { "Admin", "User", "Editor", "Moderator", "GuideAdmin", "ForumAdmin" };
+
+        foreach (var role in roles)
+        {
+            if (!await roleManager.RoleExistsAsync(role))
             {
-                if (!await roleManager.RoleExistsAsync(role))
-                {
-                    await roleManager.CreateAsync(new IdentityRole(role));
-                }
+                await roleManager.CreateAsync(new IdentityRole(role));
             }
         }
     }
