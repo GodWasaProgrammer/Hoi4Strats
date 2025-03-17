@@ -43,13 +43,16 @@
 }
 @if (typeOfGuide == GuideTypes.AirTemplate || typeOfGuide == GuideTypes.LandTemplate || typeOfGuide == GuideTypes.NavalTemplate)
 {
-    <PictureUpload Fetchupload="HandleFileUploaded" />
-    <RadzenTextArea Value="@explanationText" Style="width:200px" Placeholder="Short Explanatory text" />
-
-    @if (explanationText != null && picture != "")
+    @if (_title == "")
     {
-        <RadzenButton Click="SubmitTemplateGuide" Style="width:200px" Text="submit for inspection" />
+        <RadzenTextBox Style="width:200px" Placeholder="Title?" @bind-Value="@_title"></RadzenTextBox>
     }
+    <PictureUploadByteArray Fetchupload="HandleFileUploaded" />
+    <RadzenTextArea @bind-Value=@explanationText Style="width:200px" Placeholder="Short Explanatory text" />
+
+    <RadzenButton Click="SubmitTemplateGuide" Style="width:200px" Text="submit for inspection" />
+    <RadzenText>@_submissionFeedBack</RadzenText>
+
 }
 
 @code
@@ -60,34 +63,48 @@
     private AirTemplate airTemplate = AirTemplate.Fighter;
     private NavalTemplate navalTemplate = NavalTemplate.Destroyer;
     private string? explanationText { get; set; } = "";
-    private string picture = "";
+    private ImageModel? picture;
+    private string? _submissionFeedBack;
+    private string _title = "";
 
     private async Task SubmitTemplateGuide()
     {
-        var newGuide = new GuideModel
-            {
-                Id = 0,
-                Title = "Test",
-                Content = explanationText,
-                Author = "Author Name",
-                CreatedAt = DateTime.UtcNow
-            };
-
-        var readImgBytes = File.ReadAllBytesAsync(picture);
-        var img = new ImageModel { Content = readImgBytes.Result, ContentType = "png", Name = "test" };
-        if (newGuide.Pictures != null)
+        if (explanationText != "" && _title != "")
         {
-            newGuide.Pictures.Add(img);
-        }
+            var newGuide = new GuideModel
+                {
+                    Id = 0,
+                    Title = _title,
+                    Content = explanationText,
+                    Author = "Author Name",
+                    CreatedAt = DateTime.UtcNow
+                };
 
-        var response = await client.PostAsJsonAsync("/create-template-guide", newGuide);
-        var responseContent = await response.Content.ReadAsStringAsync();
-        Console.WriteLine($"Response Content: {responseContent}");
+            if (picture != null && newGuide.Pictures != null)
+            {
+                newGuide.Pictures.Add(picture);
+            }
+
+            var response = await client.PostAsJsonAsync("/create-guide", newGuide);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Response Content: {responseContent}");
+        }
+        else
+        {
+            if (explanationText == "")
+            {
+                _submissionFeedBack = "You need to provide a short explanation/Summary of your template.";
+            }
+            if (picture == null)
+            {
+                _submissionFeedBack += "You need to upload an image";
+            }
+        }
     }
 
     // passed into delegate to return our uploaded image
-    private void HandleFileUploaded(string filePath)
+    private void HandleFileUploaded(ImageModel UploadedImage)
     {
-        picture = filePath;
+        picture = UploadedImage;
     }
 }

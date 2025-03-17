@@ -1,0 +1,52 @@
+﻿@using SharedProj
+@using SharedProj.DBModels
+@inject HttpClient HttpClient
+
+<h3>Upload a picture</h3>
+
+<InputFile OnChange="OnFileSelected" />
+<p>@statusMessage</p>
+
+@code
+{
+    private string? statusMessage;
+    private IBrowserFile? selectedFile;
+    private string Upload = "";
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        await UploadImage();
+    }
+
+    [Parameter]
+    public EventCallback<ImageModel> Fetchupload { get; set; }
+
+    private async Task UploadImage()
+    {
+        if (selectedFile is null)
+        {
+            statusMessage = "Ingen fil vald.";
+            return;
+        }
+
+        // read bytes
+        using var memoryStream = new MemoryStream();
+        await selectedFile.OpenReadStream().CopyToAsync(memoryStream);
+        var fileBytes = memoryStream.ToArray();
+
+        // Generate random name
+        var randomFileName = $"{Guid.NewGuid()}{Path.GetExtension(selectedFile.Name)}";
+
+        // Skapa en instans av ImageModel
+        var imageModel = new ImageModel
+            {
+                Name = randomFileName,
+                Content = fileBytes,
+                ContentType = selectedFile.ContentType,
+                CreatedAt = DateTime.UtcNow,
+                GuideId = 0 // will be set by the guide so will be 0
+            };
+            await Fetchupload.InvokeAsync(imageModel);
+    }
+}
