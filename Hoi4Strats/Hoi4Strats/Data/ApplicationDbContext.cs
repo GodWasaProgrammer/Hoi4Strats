@@ -14,7 +14,6 @@ namespace Hoi4Strats.Data
         {
         }
 
-        // Lägg till DbSet-egenskaper för dina modeller
         public DbSet<GuideModel> Guides { get; set; }
         public DbSet<ImageModel> Images { get; set; }
 

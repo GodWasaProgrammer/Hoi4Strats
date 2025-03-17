@@ -138,35 +138,35 @@ public class DBService
         return guides;
     }
 
-    internal async Task CreateTemplateGuide(GuideModel guide)
-    {
-        var query = "INSERT INTO Guides (Title, Content, Author, CreatedAt) VALUES (@Title, @Content, @Author, @CreatedAt)";
+    //internal async Task CreateTemplateGuide(GuideModel guide)
+    //{
+    //    var query = "INSERT INTO Guides (Title, Content, Author, CreatedAt) VALUES (@Title, @Content, @Author, @CreatedAt)";
 
-        try
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
+    //    try
+    //    {
+    //        using (var connection = new SqlConnection(_connectionString))
+    //        {
+    //            await connection.OpenAsync();
 
-                using (var command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.Add("@Title", SqlDbType.NVarChar).Value = guide.Title;
-                    command.Parameters.Add("@Content", SqlDbType.NVarChar).Value = guide.Content;
-                    command.Parameters.Add("@Author", SqlDbType.NVarChar).Value = guide.Author;
-                    command.Parameters.Add("@CreatedAt", SqlDbType.DateTime).Value = DateTime.Now;
+    //            using (var command = new SqlCommand(query, connection))
+    //            {
+    //                command.Parameters.Add("@Title", SqlDbType.NVarChar).Value = guide.Title;
+    //                command.Parameters.Add("@Content", SqlDbType.NVarChar).Value = guide.Content;
+    //                command.Parameters.Add("@Author", SqlDbType.NVarChar).Value = guide.Author;
+    //                command.Parameters.Add("@CreatedAt", SqlDbType.DateTime).Value = DateTime.Now;
 
-                    await command.ExecuteNonQueryAsync(); // Kör SQL-frågan
-                    Console.WriteLine($"{guide.Title} written to DB");
-                    Console.WriteLine($"{guide.Content} written to DB");
-                    Console.WriteLine($"{guide.Author} written to DB");
-                    Console.WriteLine($"{guide.CreatedAt} written to DB");
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            // Logga felet, exempelvis:
-            Console.WriteLine($"An error occurred: {ex.Message}");
-        }
-    }
+    //                await command.ExecuteNonQueryAsync(); // Kör SQL-frågan
+    //                Console.WriteLine($"{guide.Title} written to DB");
+    //                Console.WriteLine($"{guide.Content} written to DB");
+    //                Console.WriteLine($"{guide.Author} written to DB");
+    //                Console.WriteLine($"{guide.CreatedAt} written to DB");
+    //            }
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        // Logga felet, exempelvis:
+    //        Console.WriteLine($"An error occurred: {ex.Message}");
+    //    }
+    //}
 }
