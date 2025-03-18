@@ -9,6 +9,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Radzen
 @inject HttpClient client;
+@inject AuthenticationStateProvider authProvider
 <h3>Create Guide</h3>
 
 <RadzenStack>
@@ -91,12 +92,13 @@
 
     private async Task SubmitGuide()
     {
+        var user = authProvider.GetAuthenticationStateAsync();
         var newGuide = new GuideModel
             {
                 Id = 0,
                 Title = Title,
                 Content = htmlValue,
-                Author = "Author Name",
+                Author = user?.Result?.User?.Identity?.Name ?? "Unknown",
                 CreatedAt = DateTime.UtcNow
             };
 
