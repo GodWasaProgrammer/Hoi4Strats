@@ -1,6 +1,8 @@
 ﻿@using SharedProj
 @using SharedProj.DBModels
 @inject HttpClient client
+@inject AuthenticationStateProvider AuthProvider
+
 <h3>Template Guide Creator</h3>
 
 @if (typeOfGuide == GuideTypes.LandTemplate)
@@ -62,7 +64,7 @@
     private LandTemplate landTemplate = LandTemplate.Infantry;
     private AirTemplate airTemplate = AirTemplate.Fighter;
     private NavalTemplate navalTemplate = NavalTemplate.Destroyer;
-    private string? explanationText { get; set; } = "";
+    private string explanationText { get; set; } = "";
     private ImageModel? picture;
     private string? _submissionFeedBack;
     private string _title = "";
@@ -71,12 +73,14 @@
     {
         if (explanationText != "" && _title != "")
         {
+            var user = AuthProvider.GetAuthenticationStateAsync();
+            
             var newGuide = new GuideModel
                 {
                     Id = 0,
                     Title = _title,
                     Content = explanationText,
-                    Author = "Author Name",
+                    Author = user?.Result?.User?.Identity?.Name ?? "Unknown",
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -97,7 +101,7 @@
             }
             if (picture == null)
             {
-                _submissionFeedBack += "You need to upload an image";
+                _submissionFeedBack = "You need to upload an image";
             }
         }
     }
