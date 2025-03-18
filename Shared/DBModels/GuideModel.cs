@@ -8,4 +8,5 @@ public class GuideModel
     public required string Author { get; set; } // Namn eller ID för författaren
     public DateTime CreatedAt { get; set; } // När guiden skapades
     public List<ImageModel>? Pictures { get; set; } = [];
+    public Review Status { get; set; } = Review.UnderReview;
 }
