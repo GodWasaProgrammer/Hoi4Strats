@@ -168,12 +168,48 @@ public class DBService
                         CreatedAt = reader.GetDateTime(4),
                         GuideType = (GuideTypes)reader.GetInt32(5) // Konvertera int till enum
                     };
+                    guide.Pictures = await GetPicturesForGuide(guide.Id);
                     guides.Add(guide);
                 }
             }
         }
         return guides;
     }
+
+    private async Task<List<ImageModel>> GetPicturesForGuide(int guideId)
+    {
+        var pictures = new List<ImageModel>();
+        var query = "SELECT ImageId, Name, Content, ContentType, CreatedAt FROM Images WHERE GuideId = @GuideId";
+
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            using (var command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@GuideId", guideId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var picture = new ImageModel
+                        {
+                            ImageId = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            Content = (byte[])reader["Content"],
+                            ContentType = reader.GetString(3),
+                            CreatedAt = reader.GetDateTime(4),
+                            GuideId = guideId
+                        };
+                        pictures.Add(picture);
+                    }
+                }
+            }
+        }
+        return pictures;
+    }
+
     //public async Task<List<GuideModel>> GetGuides()
     //{
     //    var guides = new List<GuideModel>();

@@ -1,0 +1,34 @@
+﻿@using SharedProj.DBModels
+
+<RadzenPanel>
+    <HeaderTemplate>
+        <h3>@GM.Title</h3>
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenHtml>
+            @((MarkupString)GM.Content)
+        </RadzenHtml>
+        @* <RadzenImage Path="@Model.ImagePath" Style="max-width: 100%; margin-top: 20px;" /> *@
+    </ChildContent>
+</RadzenPanel>
+@foreach (var img in GM.Pictures)
+{
+    var bla = Convert.ToBase64String(img.Content);
+    <RadzenImage Path="@ToBase64DataUri(img)" />
+}
+
+
+@code
+{
+    [Parameter]
+    public required GuideModel GM { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+    public string ToBase64DataUri(ImageModel img)
+    {
+        return $"data:{img.ContentType};base64,{Convert.ToBase64String(img.Content)}";
+    }
+}

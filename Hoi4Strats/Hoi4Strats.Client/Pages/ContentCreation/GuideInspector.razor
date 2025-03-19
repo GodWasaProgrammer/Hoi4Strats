@@ -5,34 +5,42 @@
 @using System.Text.Json
 
 <h3>GuideInspector</h3>
+@if (!GuideSelected)
+{
+    <h2>This is where Guide Administrator approve Guides/Templates</h2>
+    <div>
+        <RadzenText>Templates</RadzenText>
+        <RadzenDataGrid @ref="templateGrid" TItem="GuideModel" Data="@TemplatesToInspect" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="5" RowClick="OnTemplateGuideClicked">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
+                <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+            </Columns>
+        </RadzenDataGrid>
+    </div>
 
-<h2>This is where Guide Administrator approve Guides/Templates</h2>
-<div>
-    <RadzenText>Templates</RadzenText>
-    <RadzenDataGrid @ref="templateGrid" TItem="GuideModel" Data="@TemplatesToInspect" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="5" RowClick="OnTemplateGuideClicked">
-        <Columns>
-            <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
-            <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
-        </Columns>
-    </RadzenDataGrid>
-</div>
-
-<div>
-    <RadzenText>Countries</RadzenText>
-    <RadzenDataGrid TItem="GuideModel" Data="@CountryGuidesToInspect" AllowPaging="true" PageSize="5" RowClick="OnCountryGuideClicked">
-        <Columns>
-            <RadzenDataGridColumn Property="@nameof(GuideModel.Title)" Title="Title" />
-            <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
-            <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
-        </Columns>
-    </RadzenDataGrid>
-</div>
-<RadzenText>@TemplatesToInspect.Count</RadzenText>
+    <div>
+        <RadzenText>Countries</RadzenText>
+        <RadzenDataGrid TItem="GuideModel" Data="@CountryGuidesToInspect" AllowPaging="true" PageSize="5" RowClick="OnCountryGuideClicked">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(GuideModel.Title)" Title="Title" />
+                <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
+                <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+            </Columns>
+        </RadzenDataGrid>
+    </div>
+}
+@if (GuideSelected)
+{
+    <Inspector GM="@_GM" />
+}
+@* <RadzenText>@TemplatesToInspect.Count</RadzenText> *@
 @code
 {
     List<GuideModel> CountryGuidesToInspect = new();
     List<GuideModel> TemplatesToInspect = new();
     private RadzenDataGrid<GuideModel>? templateGrid;
+    private bool GuideSelected = false;
+    private GuideModel? _GM;
 
     private async Task<List<GuideModel>> FetchReviewGuides()
     {
@@ -52,7 +60,6 @@
 
                 if (guides != null)
                 {
-                    // Gör något med den hämtade listan av guider
                     Console.WriteLine($"Fetched {guides.Count} guides for inspector.");
                     return guides;
                 }
@@ -84,7 +91,7 @@
             {
                 CountryGuidesToInspect.Add(guide);
             }
-            if (guide.GuideType == GuideTypes.AirTemplate || guide.GuideType == GuideTypes.LandTemplate || guide.GuideType == GuideTypes.Sea)
+            if (guide.GuideType == GuideTypes.AirTemplate || guide.GuideType == GuideTypes.LandTemplate || guide.GuideType == GuideTypes.NavalTemplate)
             {
                 TemplatesToInspect.Add(guide);
             }
@@ -96,12 +103,16 @@
     {
         // Hantera klicket, t.ex. navigera till trådar i den här kategorin
         Console.WriteLine($"Clicked on Template Guide: {ClickedGuide.Data.Author}");
+        _GM = ClickedGuide.Data;
+        GuideSelected = true;
         // NavigationManager.NavigateTo($"/forum/category/{category.ID}");
     }
     private void OnCountryGuideClicked(DataGridRowMouseEventArgs<GuideModel> ClickedGuide)
     {
         // Hantera klicket, t.ex. navigera till trådar i den här kategorin
         Console.WriteLine($"Clicked on Country Guide: {ClickedGuide.Data.Author}");
+        _GM = ClickedGuide.Data;
+        GuideSelected = true;
         // NavigationManager.NavigateTo($"/forum/category/{category.ID}");
     }
     // GuideModel dummyGuide = new GuideModel
