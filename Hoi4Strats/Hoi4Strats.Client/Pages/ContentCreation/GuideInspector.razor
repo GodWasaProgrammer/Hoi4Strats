@@ -9,7 +9,7 @@
 <h2>This is where Guide Administrator approve Guides/Templates</h2>
 <div>
     <RadzenText>Templates</RadzenText>
-    <RadzenDataGrid TItem="GuideModel" Data="@TemplatesToInspect" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="5" RowClick="OnTemplateGuideClicked">
+    <RadzenDataGrid @ref="templateGrid" TItem="GuideModel" Data="@TemplatesToInspect" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="5" RowClick="OnTemplateGuideClicked">
         <Columns>
             <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
             <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
@@ -27,32 +27,12 @@
         </Columns>
     </RadzenDataGrid>
 </div>
-
+<RadzenText>@TemplatesToInspect.Count</RadzenText>
 @code
 {
     List<GuideModel> CountryGuidesToInspect = new();
     List<GuideModel> TemplatesToInspect = new();
-
-    // GuideModel dummyGuide = new GuideModel
-    //     {
-    //         Id = 1,
-    //         Content = "Det här är ett exempel på innehåll för en guide.",
-    //         Author = "Test Författare",
-    //         Title = "Template Testing",
-    //     // Pictures = "dummy-image-url.jpg",
-    //         CreatedAt = DateTime.Now,
-    //         GuideType = GuideTypes.AirTemplate
-    //     };
-
-    // GuideModel dummyCountryGuide = new GuideModel
-    //     {
-    //         Id = 1,
-    //         Content = "bla bla",
-    //         Author = "Sven",
-    //         CreatedAt = DateTime.Now,
-    //         Title = "Peak Germany",
-    //         GuideType = GuideTypes.Country
-    //     };
+    private RadzenDataGrid<GuideModel>? templateGrid;
 
     private async Task<List<GuideModel>> FetchReviewGuides()
     {
@@ -95,19 +75,22 @@
         // TemplatesToInspect.Add(dummyGuide);
         // CountryGuidesToInspect.Add(dummyCountryGuide);
         var guides = await FetchReviewGuides();
+        TemplatesToInspect = new();
+        CountryGuidesToInspect = new();
 
-        foreach(var guide in guides)
+        foreach (var guide in guides)
         {
-            if(guide.GuideType == GuideTypes.Country)
+            if (guide.GuideType == GuideTypes.Country)
             {
                 CountryGuidesToInspect.Add(guide);
             }
-            if(guide.GuideType == GuideTypes.AirTemplate || guide.GuideType == GuideTypes.LandTemplate || guide.GuideType == GuideTypes.Sea)
+            if (guide.GuideType == GuideTypes.AirTemplate || guide.GuideType == GuideTypes.LandTemplate || guide.GuideType == GuideTypes.Sea)
             {
                 TemplatesToInspect.Add(guide);
             }
         }
-        StateHasChanged();
+        //await InvokeAsync(StateHasChanged);
+        //await templateGrid.Reload();
     }
     private void OnTemplateGuideClicked(DataGridRowMouseEventArgs<GuideModel> ClickedGuide)
     {
@@ -121,4 +104,24 @@
         Console.WriteLine($"Clicked on Country Guide: {ClickedGuide.Data.Author}");
         // NavigationManager.NavigateTo($"/forum/category/{category.ID}");
     }
+    // GuideModel dummyGuide = new GuideModel
+    //     {
+    //         Id = 1,
+    //         Content = "Det här är ett exempel på innehåll för en guide.",
+    //         Author = "Test Författare",
+    //         Title = "Template Testing",
+    //     // Pictures = "dummy-image-url.jpg",
+    //         CreatedAt = DateTime.Now,
+    //         GuideType = GuideTypes.AirTemplate
+    //     };
+
+    // GuideModel dummyCountryGuide = new GuideModel
+    //     {
+    //         Id = 1,
+    //         Content = "bla bla",
+    //         Author = "Sven",
+    //         CreatedAt = DateTime.Now,
+    //         Title = "Peak Germany",
+    //         GuideType = GuideTypes.Country
+    //     };
 }
