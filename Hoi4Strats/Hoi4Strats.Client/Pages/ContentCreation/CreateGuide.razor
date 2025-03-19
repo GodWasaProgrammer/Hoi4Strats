@@ -99,7 +99,8 @@
                 Title = Title,
                 Content = htmlValue,
                 Author = user?.Result?.User?.Identity?.Name ?? "Unknown",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                GuideType = typeOfGuide
             };
 
         var response = await client.PostAsJsonAsync("/create-guide", newGuide);

@@ -9,4 +9,5 @@ public class GuideModel
     public DateTime CreatedAt { get; set; } // När guiden skapades
     public List<ImageModel>? Pictures { get; set; } = [];
     public Review Status { get; set; } = Review.UnderReview;
+    public required GuideTypes GuideType { get; set; }
 }

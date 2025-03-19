@@ -1,29 +1,31 @@
 ﻿@page "/Inspector"
 @using SharedProj.DBModels
+@using SharedProj
 @using Radzen
+@using System.Text.Json
 
 <h3>GuideInspector</h3>
 
 <h2>This is where Guide Administrator approve Guides/Templates</h2>
 <div>
-<RadzenText>Templates</RadzenText>
+    <RadzenText>Templates</RadzenText>
     <RadzenDataGrid TItem="GuideModel" Data="@TemplatesToInspect" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="5" RowClick="OnTemplateGuideClicked">
-    <Columns>
-        <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author"/>
-            <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created"/>
-    </Columns>
-</RadzenDataGrid>
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
+            <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+        </Columns>
+    </RadzenDataGrid>
 </div>
 
 <div>
-<RadzenText>Countries</RadzenText>
-<RadzenDataGrid TItem="GuideModel" Data="@CountryGuidesToInspect" AllowPaging="true" PageSize="5" RowClick="OnCountryGuideClicked">
-    <Columns>
-        <RadzenDataGridColumn Property="@nameof(GuideModel.Title)" Title="Title"/> 
-        <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author"/>
-        <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created"/>
-    </Columns>
-</RadzenDataGrid>
+    <RadzenText>Countries</RadzenText>
+    <RadzenDataGrid TItem="GuideModel" Data="@CountryGuidesToInspect" AllowPaging="true" PageSize="5" RowClick="OnCountryGuideClicked">
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(GuideModel.Title)" Title="Title" />
+            <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
+            <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+        </Columns>
+    </RadzenDataGrid>
 </div>
 
 @code
@@ -31,29 +33,81 @@
     List<GuideModel> CountryGuidesToInspect = new();
     List<GuideModel> TemplatesToInspect = new();
 
-    GuideModel dummyGuide = new GuideModel
-        {
-            Id = 1,
-            Content = "Det här är ett exempel på innehåll för en guide.",
-            Author = "Test Författare",
-            Title = "Template Testing",
-            // Pictures = "dummy-image-url.jpg",
-            CreatedAt = DateTime.Now
-        };
+    // GuideModel dummyGuide = new GuideModel
+    //     {
+    //         Id = 1,
+    //         Content = "Det här är ett exempel på innehåll för en guide.",
+    //         Author = "Test Författare",
+    //         Title = "Template Testing",
+    //     // Pictures = "dummy-image-url.jpg",
+    //         CreatedAt = DateTime.Now,
+    //         GuideType = GuideTypes.AirTemplate
+    //     };
 
-    GuideModel dummyCountryGuide = new GuideModel
-        {
-            Id = 1,
-            Content = "bla bla",
-            Author = "Sven",
-            CreatedAt = DateTime.Now,
-            Title = "Peak Germany"
-        };
+    // GuideModel dummyCountryGuide = new GuideModel
+    //     {
+    //         Id = 1,
+    //         Content = "bla bla",
+    //         Author = "Sven",
+    //         CreatedAt = DateTime.Now,
+    //         Title = "Peak Germany",
+    //         GuideType = GuideTypes.Country
+    //     };
 
-    protected override void OnInitialized()
+    private async Task<List<GuideModel>> FetchReviewGuides()
     {
-        TemplatesToInspect.Add(dummyGuide);
-        CountryGuidesToInspect.Add(dummyCountryGuide);
+        var client = new HttpClient { BaseAddress = new Uri("https://localhost:7141/") }; // Ange korrekt basadress för API:et
+
+        try
+        {
+            var response = await client.GetAsync("/get-guides");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonData = await response.Content.ReadAsStringAsync();
+                var guides = JsonSerializer.Deserialize<List<GuideModel>>(jsonData, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                if (guides != null)
+                {
+                    // Gör något med den hämtade listan av guider
+                    Console.WriteLine($"Fetched {guides.Count} guides for inspector.");
+                    return guides;
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Failed to fetch guides: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception when fetching guides: {ex.Message}");
+        }
+        // fallback
+        return new List<GuideModel>();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // TemplatesToInspect.Add(dummyGuide);
+        // CountryGuidesToInspect.Add(dummyCountryGuide);
+        var guides = await FetchReviewGuides();
+
+        foreach(var guide in guides)
+        {
+            if(guide.GuideType == GuideTypes.Country)
+            {
+                CountryGuidesToInspect.Add(guide);
+            }
+            if(guide.GuideType == GuideTypes.AirTemplate || guide.GuideType == GuideTypes.LandTemplate || guide.GuideType == GuideTypes.Sea)
+            {
+                TemplatesToInspect.Add(guide);
+            }
+        }
+        StateHasChanged();
     }
     private void OnTemplateGuideClicked(DataGridRowMouseEventArgs<GuideModel> ClickedGuide)
     {

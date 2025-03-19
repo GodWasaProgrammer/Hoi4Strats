@@ -81,7 +81,8 @@
                     Title = _title,
                     Content = explanationText,
                     Author = user?.Result?.User?.Identity?.Name ?? "Unknown",
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    GuideType = typeOfGuide
                 };
 
             if (picture != null && newGuide.Pictures != null)
