@@ -16,11 +16,11 @@
     <RadzenStack>
         <RadzenLabel Text="Select Guide Type" />
         <RadzenDropDown TValue="string"
-                        Value="@typeOfGuide.ToString()"
-                        Data="@Enum.GetNames(typeof(GuideTypes))"
-                        Change="@(args => typeOfGuide = Enum.Parse<GuideTypes>(args.ToString()))"
-                        Style="width: 100%; max-width: 400px;"
-                        Name="GuideTypeDropdown" />
+        Value="@typeOfGuide.ToString()"
+        Data="@Enum.GetNames(typeof(GuideTypes))"
+        Change="@(args => typeOfGuide = Enum.Parse<GuideTypes>(args.ToString()))"
+        Style="width: 100%; max-width: 400px;"
+        Name="GuideTypeDropdown" />
     </RadzenStack>
 
     <p>Selected Guide Type: @typeOfGuide</p>
@@ -40,11 +40,12 @@
             @if (Title != "")
             {
                 <RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput
-                                  Change=@OnChange
-                                  Paste=@OnPaste
-                                  UploadComplete=@OnUploadComplete
-                                  Execute=@OnExecute
-                                  UploadUrl="upload/image" />
+                Change=@OnChange
+                Paste=@OnPaste
+                UploadComplete=@OnUploadComplete
+                Execute=@OnExecute
+                UploadUrl="upload/blob"
+                Header="@(new Dictionary<string, string> { { "Upload-Session-Id", uploadSessionId } })" />
                 //<EventConsole @ref=@console />
                 <RadzenButton Click="(() => SubmitGuide())">Submit for review</RadzenButton>
             }
@@ -84,10 +85,15 @@
     {
         Console.WriteLine($"Upload complete: {args.RawResponse}");
     }
+    private string uploadSessionId = Guid.NewGuid().ToString();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+    }
+    private void UploadToTempStorage()
+    {
+        
     }
 
     private async Task SubmitGuide()
