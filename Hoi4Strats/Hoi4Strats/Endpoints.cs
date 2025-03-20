@@ -79,7 +79,7 @@ public static class Endpoints
                 {
                     Message = "Image uploaded successfully",
                     SessionId = sessionId,
-                    Base64Uri = base64Uri,
+                    Url = base64Uri,
                     ImageName = image.Name
                 });
             }
