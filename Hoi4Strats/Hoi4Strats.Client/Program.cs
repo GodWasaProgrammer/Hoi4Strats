@@ -10,7 +10,7 @@ internal class Program
     static async Task Main(string[] args)
     {
         var builder = WebAssemblyHostBuilder.CreateDefault(args);
-        System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+        //System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         builder.Services.AddSingleton<UserService>();
         builder.Services.AddAuthorizationCore();
         builder.Services.AddCascadingAuthenticationState();

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SharedProj.DBModels;
 using SharedProj.newsitems;
 
@@ -16,11 +17,33 @@ public static class Endpoints
             return Results.Ok(guides);
         });
 
-        app.MapPost("/create-guide", async (GuideModel guide, DBService dbService) =>
+        app.MapPost("/create-guide", async (GuideModel guide, [FromQuery] Guid? sessionId, DBService dbService) =>
         {
+            if (sessionId.HasValue)
+            {
+                // Look up Images related to the guide
+                if (TempImageStorage.TryGetValue(sessionId.Value, out var images))
+                {
+                    // add guides 
+                    guide.Pictures = images;
+                    TempImageStorage.Remove(sessionId.Value); // clear the tempstore
+                }
+                else
+                {
+                    return Results.BadRequest("SessionId not found or has no images.");
+                }
+            }
+
+            // Skapa guiden
             await dbService.CreateGuide(guide);
             return Results.Ok("Guide created successfully");
         });
+
+        //app.MapPost("/create-guide", async (GuideModel guide, DBService dbService) =>
+        //{
+        //    await dbService.CreateGuide(guide);
+        //    return Results.Ok("Guide created successfully");
+        //});
     }
 
     public static void MapImageUploadEndpoint(this WebApplication app)

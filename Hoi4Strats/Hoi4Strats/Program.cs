@@ -16,7 +16,7 @@ public class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+        //System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
         // Add services to the container
         builder.Services.AddRazorComponents()
@@ -56,7 +56,7 @@ public class Program
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
         builder.Services.AddScoped<DialogService>();
-
+       
         var app = builder.Build();
 
         // Configure the HTTP request pipeline
@@ -71,6 +71,7 @@ public class Program
         }
         app.UseHttpsRedirection();
         app.UseStaticFiles();
+        app.MapStaticAssets();
         app.MapRazorComponents<App>()
            .AddInteractiveServerRenderMode()
            .AddInteractiveWebAssemblyRenderMode()
