@@ -85,6 +85,7 @@ public class Program
         Endpoints.MapGuideEndpoints(app);
         Endpoints.MapNewsEndpoint(app);
         Endpoints.MapImageUploadEndpoint(app);
+        Endpoints.BlobImageUpload(app);
         Tests.TestConnection();
 
         // Ensure roles are created when application starts

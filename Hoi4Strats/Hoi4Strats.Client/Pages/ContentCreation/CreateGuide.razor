@@ -45,7 +45,7 @@
                 UploadComplete=@OnUploadComplete
                 Execute=@OnExecute
                 UploadUrl="upload/blob"
-                Header="@(new Dictionary<string, string> { { "Upload-Session-Id", uploadSessionId } })" />
+                UploadHeaders="@_uploadUrl" />
                 //<EventConsole @ref=@console />
                 <RadzenButton Click="(() => SubmitGuide())">Submit for review</RadzenButton>
             }
@@ -59,7 +59,7 @@
     string htmlValue = @"<h2 style=""text-align:center"">Din guide här</h2>";
     private GuideTypes typeOfGuide = GuideTypes.Select;
     private LandTemplate landTemplate = LandTemplate.Infantry;
-
+    private Dictionary<string, string>? _uploadUrl;
 
     void OnPaste(HtmlEditorPasteEventArgs args)
     {
@@ -89,13 +89,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _uploadUrl = new Dictionary<string, string>
+        {
+            { "Upload-Session-Id", uploadSessionId } 
+        };
         await base.OnInitializedAsync();
     }
-    private void UploadToTempStorage()
-    {
-        
-    }
-
+    
     private async Task SubmitGuide()
     {
         var user = authProvider.GetAuthenticationStateAsync();
