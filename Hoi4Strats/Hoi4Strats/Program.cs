@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
 using SharedProj;
-using System.Net;
 
 namespace Hoi4Strats;
 
@@ -16,7 +15,6 @@ public class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        //System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
         // Add services to the container
         builder.Services.AddRazorComponents()
@@ -38,8 +36,6 @@ public class Program
             options.Duration = TimeSpan.FromDays(365);
         });
 
-        //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-        //    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(dbServiceString));
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -51,12 +47,27 @@ public class Program
             .AddDefaultTokenProviders();
 
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7141/") });
 
+        // .NET 9 setup of TLS 1.2
+        builder.Services.AddScoped(sp =>
+        {
+            var handler = new SocketsHttpHandler
+            {
+                SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+                {
+                    EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+                }
+            };
+
+            return new HttpClient(handler)
+            {
+                BaseAddress = new Uri("https://localhost:7141/")
+            };
+        });
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
         builder.Services.AddScoped<DialogService>();
-       
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline
