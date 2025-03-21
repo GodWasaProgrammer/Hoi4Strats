@@ -7,7 +7,7 @@ namespace Hoi4Strats;
 
 public static class Endpoints
 {
-    private static readonly Dictionary<Guid, List<ImageModel>> TempImageStorage = new();
+    private static readonly Dictionary<Guid, List<ImageModel>> TempImageStorage = [];
 
     public static void MapGuideEndpoints(this WebApplication app)
     {
@@ -73,14 +73,26 @@ public static class Endpoints
         {
             var form = await request.ReadFormAsync();
             IFormFile? file = form.Files.FirstOrDefault();
-            string uploadSessionId = request.Headers["Upload-Session-Id"];
+
+            string? uploadSessionId;
+            if (request.Headers.TryGetValue("Upload-Session-Id", out var headerValue))
+            {
+                uploadSessionId = headerValue;
+            }
+            else
+            {
+                // Hantera fallet när nyckeln saknas.
+                throw new InvalidOperationException("Upload-Session-Id header is required.");
+            }
+
+            //string uploadSessionId = request.Headers["Upload-Session-Id"];
 
             if (file != null && !string.IsNullOrEmpty(uploadSessionId) && Guid.TryParse(uploadSessionId, out var sessionId))
             {
                 // Lägg till bilden i mellanlagringen
                 if (!TempImageStorage.ContainsKey(sessionId))
                 {
-                    TempImageStorage[sessionId] = new List<ImageModel>();
+                    TempImageStorage[sessionId] = [];
                 }
 
                 using var ms = new MemoryStream();

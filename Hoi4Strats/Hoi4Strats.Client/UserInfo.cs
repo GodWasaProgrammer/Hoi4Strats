@@ -6,6 +6,6 @@ namespace Hoi4Strats.Client
     {
         public required string UserId { get; set; }
         public required string Email { get; set; }
-        public List<string> Roles { get; set; } = new List<string>();
+        public List<string> Roles { get; set; } = [];
     }
 }
