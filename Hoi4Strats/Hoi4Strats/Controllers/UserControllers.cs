@@ -1,13 +1,10 @@
-﻿namespace Hoi4Strats.Controllers;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedProj;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-//[Authorize]
+namespace Hoi4Strats.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 
@@ -15,11 +12,16 @@ public class UserController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly IConfiguration _configuration;
+    private readonly IConfiguration? configuration;
+    private readonly ITokenService _tokenService;
 
-    public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+    public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration? configuration, ITokenService tokenService)
     {
         _userManager = userManager;
         _roleManager = roleManager;
+        _configuration = configuration;
+        _tokenService = tokenService;
     }
 
     [HttpGet("GetUsers")]
@@ -40,6 +42,7 @@ public class UserController : ControllerBase
         return Ok(await _userManager.GetRolesAsync(user));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("UpdateRoles")]
     public async Task<IActionResult> UpdateRoles([FromBody] UpdateRolesDto updateRolesDto)
     {
@@ -51,7 +54,7 @@ public class UserController : ControllerBase
                 return NotFound();
             }
             var currentRoles = await _userManager.GetRolesAsync(user);
-            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            var identity = await _userManager.RemoveFromRolesAsync(user, currentRoles);
             await _userManager.AddToRolesAsync(user, updateRolesDto.Roles);
         }
 
@@ -64,4 +67,21 @@ public class UserController : ControllerBase
         var roles = await _roleManager.Roles.Select(role => role.Name).ToListAsync();
         return Ok(roles);
     }
+
+    [HttpPost("Login")]
+    public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+    {
+        var user = await _userManager.FindByNameAsync(loginDto.Username);
+        if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = _tokenService.GenerateToken(user.Id, roles.ToList());
+
+            return Ok(new { Token = token });
+        }
+
+        return Unauthorized("Invalid username or password");
+    }
+
+
 }

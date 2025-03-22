@@ -56,15 +56,29 @@
         if (dialogResult != null)
         {
             var newRoles = (List<string>)dialogResult;
-            await UService.UpdateRolesAsync(selectedUser.Id, newRoles);
+            var response = await UService.UpdateRolesAsync(selectedUser.Id, newRoles);
 
-            NotificationService.Notify(new NotificationMessage
+            // Kontrollera resultatet och visa notifiering
+            if (response.Equals("OK", StringComparison.OrdinalIgnoreCase))
+            {
+                NotificationService.Notify(new NotificationMessage
                 {
                     Severity = NotificationSeverity.Success,
                     Summary = "Roles Updated",
                     Detail = $"Roles for {selectedUser.UserName} have been updated.",
                     Duration = 4000
                 });
+            }
+            else
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Update Failed",
+                    Detail = $"Failed to update roles for {selectedUser.UserName}. Reason: {response}",
+                    Duration = 4000
+                });
+            }
         }
         if (userRoleDisplayRefs.TryGetValue(user.Id, out var userRoleDisplay))
         {

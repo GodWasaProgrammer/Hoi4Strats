@@ -1,12 +1,17 @@
 using Hoi4Strats.Client.Services;
 using Hoi4Strats.Components;
 using Hoi4Strats.Components.Account;
+using Hoi4Strats.Controllers;
 using Hoi4Strats.Data;
+using Hoi4Strats.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Radzen;
 using SharedProj;
+using System.Text;
 
 namespace Hoi4Strats;
 
@@ -16,7 +21,24 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(s: builder.Configuration["Jwt:7734"]))
+                };
+            });
+        builder.Services.AddAuthorizationCore(options =>
+        {
+            options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+        });// Add services to the container
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents()
             .AddInteractiveWebAssemblyComponents();
@@ -45,6 +67,7 @@ public class Program
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
+        builder.Services.AddScoped<ITokenService, TokenService>();
 
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 

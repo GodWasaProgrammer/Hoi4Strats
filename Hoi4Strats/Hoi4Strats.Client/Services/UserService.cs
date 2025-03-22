@@ -40,11 +40,35 @@ public class UserService
         }
     }
 
-    public async Task UpdateRolesAsync(string userId, List<string> roles)
+    public async Task<string> UpdateRolesAsync(string userId, List<string> roles)
     {
         var dto = new UpdateRolesDto { UserId = userId, Roles = roles };
         var response = await _httpClient.PostAsJsonAsync("api/User/UpdateRoles", dto);
         response.EnsureSuccessStatusCode(); // Kasta ett undantag om svaret inte är framgångsrikt
+
+        if (response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            if (content.Contains("<"))
+            {
+                return "Access Denied";
+            }
+            Console.WriteLine($"HTTP Response:{content}");
+
+        }
+        if (response.Headers.Location != null)
+        {
+            Console.WriteLine($"{response.Headers.Location}");
+        }
+
+        if (response.StatusCode.ToString() == "NoContent")
+        {
+            return "OK";
+        }
+        else
+        {
+            return response.StatusCode.ToString();
+        }
     }
 
     public async Task<List<string>> GetAllRolesAsync()
