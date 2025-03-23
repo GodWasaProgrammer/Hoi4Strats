@@ -12,8 +12,7 @@ public class UserController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IConfiguration _configuration;
-    private readonly IConfiguration? configuration;
+    private readonly IConfiguration? _configuration;
     private readonly ITokenService _tokenService;
 
     public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration? configuration, ITokenService tokenService)
@@ -83,5 +82,14 @@ public class UserController : ControllerBase
         return Unauthorized("Invalid username or password");
     }
 
-
+    //[HttpPost("LogOut")]
+    //public async Task<IActionResult> Logout()
+    //{
+    //    await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+    //    foreach (var cookie in Request.Cookies.Keys)
+    //    {
+    //        Response.Cookies.Delete(cookie);
+    //    }
+    //    return Ok(); // Säkerställ att detta returnerar 200 OK
+    //}
 }

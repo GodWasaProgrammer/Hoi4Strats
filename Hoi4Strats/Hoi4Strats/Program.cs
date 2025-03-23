@@ -24,6 +24,7 @@ public class Program
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
+                options.RequireHttpsMetadata = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -32,7 +33,7 @@ public class Program
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(s: builder.Configuration["Jwt:7734"]))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(s: builder.Configuration["Jwt:Key"]))
                 };
             });
         builder.Services.AddAuthorizationCore(options =>
@@ -56,6 +57,8 @@ public class Program
         {
             options.Name = "MyApplicationTheme";
             options.Duration = TimeSpan.FromDays(365);
+            options.IsSecure = true;
+            options.SameSite = CookieSameSiteMode.Lax;
         });
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -66,8 +69,22 @@ public class Program
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddSignInManager()
+
+            // Tokens
             .AddDefaultTokenProviders();
         builder.Services.AddScoped<ITokenService, TokenService>();
+
+        //builder.Services.ConfigureApplicationCookie(options =>
+        //{
+        //    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Demand HTTPS
+        //    options.Cookie.SameSite = SameSiteMode.Lax; // Hindrar otillåtna begäran mellan sidor
+        //    options.Cookie.HttpOnly = true; // Gör cookien otillgänglig för JavaScript
+        //});
+        builder.Services.Configure<CookiePolicyOptions>(options =>
+        {
+            options.MinimumSameSitePolicy = SameSiteMode.Lax; // Eller Strict beroende på behov
+            options.Secure = CookieSecurePolicy.Always;       // Kräver HTTPS
+        });
 
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
@@ -76,9 +93,12 @@ public class Program
         {
             var handler = new SocketsHttpHandler
             {
+                UseCookies = true,
+                Credentials = System.Net.CredentialCache.DefaultCredentials,
                 SslOptions = new System.Net.Security.SslClientAuthenticationOptions
                 {
-                    EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+                    EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12,
+                    RemoteCertificateValidationCallback = (sender, cert, chain, errors) => true
                 }
             };
 
@@ -87,11 +107,37 @@ public class Program
                 BaseAddress = new Uri("https://localhost:7141/")
             };
         });
+        //builder.Services.AddHttpClient("MyHttpClient", client =>
+        //{
+        //    client.BaseAddress = new Uri("https://localhost:7141/");
+        //});
+        //.ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+        //{
+        //    UseCookies = true,
+        //    Credentials = System.Net.CredentialCache.DefaultCredentials,
+        //    SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+        //    {
+        //        EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+        //    }
+        //});
+
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
         builder.Services.AddScoped<DialogService>();
+        builder.Services.AddSignalR(options =>
+        {
+            options.EnableDetailedErrors = true;
+        })
+.AddJsonProtocol();
 
         var app = builder.Build();
+        app.UseCors(policy =>
+        {
+            policy.WithOrigins("https://localhost:7141")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials(); // Krävs för cookies och WebSockets
+        });
 
         // Configure the HTTP request pipeline
         if (app.Environment.IsDevelopment())
@@ -112,11 +158,18 @@ public class Program
            .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
 
         app.MapAdditionalIdentityEndpoints();
+
+        app.UseCookiePolicy(new CookiePolicyOptions
+        {
+            Secure = CookieSecurePolicy.Always, // Kräver HTTPS för alla cookies
+            MinimumSameSitePolicy = SameSiteMode.Lax // Eller SameSiteMode.Strict beroende på krav
+        });
         app.UseRouting();
+        app.UseAntiforgery();
+
         app.MapControllers();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.UseAntiforgery();
         Endpoints.MapGuideEndpoints(app);
         Endpoints.MapNewsEndpoint(app);
         Endpoints.MapImageUploadEndpoint(app);
