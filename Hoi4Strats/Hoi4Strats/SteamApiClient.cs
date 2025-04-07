@@ -35,8 +35,9 @@ public class SteamApiClient
         }
         catch (HttpRequestException e)
         {
+            Console.WriteLine($"Request error: {e.Message}");
             // Hantera fel, returnera felmeddelande
-            return $"Request error: {e.Message}";
+            return null;
         }
     }
 }

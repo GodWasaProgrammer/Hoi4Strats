@@ -134,8 +134,15 @@ public static class Endpoints
         {
             var steamapi = new SteamApiClient();
             var json = await steamapi.GetNewsForHeartsOfIronAsync();
+        if (json != null) 
+        {
             var news = JsonConvert.DeserializeObject<Root>(json);
-            return news != null ? Results.Ok(news) : Results.BadRequest("Deserialization failed.");
+                return news != null ? Results.Ok(news) : Results.BadRequest("Deserialization failed.");
+            }
+            else
+            {
+                return Results.BadRequest("There seems to be an issue with Steams API");
+            }
         });
     }
 }
