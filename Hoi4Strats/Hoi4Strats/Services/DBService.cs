@@ -75,10 +75,59 @@ public class DBService
         }
     }
 
+    public async Task<GuideModel> ReviewDecisionAsync(GuideModel guideToUpdate)
+    {
+        if (guideToUpdate == null)
+            throw new ArgumentNullException(nameof(guideToUpdate));
+
+        const string query = @"
+        UPDATE Guides
+        SET 
+            Title = @Title,
+            Content = @Content,
+            Author = @Author,
+            GuideType = @GuideType,
+            Status = @Status
+        WHERE Id = @Id";
+
+        try
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Title", guideToUpdate.Title ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@Content", guideToUpdate.Content ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@Author", guideToUpdate.Author ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@GuideType", (int)guideToUpdate.GuideType);
+            command.Parameters.AddWithValue("@Status", guideToUpdate.Status);
+            command.Parameters.AddWithValue("@Id", guideToUpdate.Id);
+
+            var rowsAffected = await command.ExecuteNonQueryAsync();
+
+            if (rowsAffected == 0)
+                throw new InvalidOperationException("No rows were updated. The guide may not exist.");
+        }
+        catch (SqlException ex)
+        {
+            // Logga eller hantera SQL-specifika fel
+            throw new Exception("An error occurred while updating the guide in the database.", ex);
+        }
+        catch (Exception ex)
+        {
+            // Logga eller hantera generella fel
+            throw new Exception("An unexpected error occurred.", ex);
+        }
+
+        return guideToUpdate; // Returnera uppdaterat objekt
+    }
+
+
+
     public async Task<List<GuideModel>> GetGuides()
     {
         var guides = new List<GuideModel>();
-        var query = "SELECT Id, Title, Content, Author, CreatedAt, GuideType FROM Guides";
+        var query = "SELECT Id, Title, Content, Author, CreatedAt, Status, GuideType FROM Guides";
 
         using (var connection = new SqlConnection(_connectionString))
         {
@@ -95,7 +144,8 @@ public class DBService
                     Content = reader.GetString(2),
                     Author = reader.GetString(3),
                     CreatedAt = reader.GetDateTime(4),
-                    GuideType = (GuideTypes)reader.GetInt32(5) // Konvertera int till enum
+                    Status = (Review)reader.GetInt32(5),
+                    GuideType = (GuideTypes)reader.GetInt32(6) // Konvertera int till enum
                 };
                 guide.Pictures = await GetPicturesForGuide(guide.Id);
                 guides.Add(guide);

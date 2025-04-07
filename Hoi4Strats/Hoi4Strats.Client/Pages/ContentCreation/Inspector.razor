@@ -1,4 +1,6 @@
-﻿@using SharedProj.DBModels
+﻿@using SharedProj
+@using SharedProj.DBModels
+@inject HttpClient client
 
 <RadzenPanel>
     <HeaderTemplate>
@@ -8,27 +10,62 @@
         <RadzenHtml>
             @((MarkupString)GM.Content)
         </RadzenHtml>
-        @* <RadzenImage Path="@Model.ImagePath" Style="max-width: 100%; margin-top: 20px;" /> *@
     </ChildContent>
 </RadzenPanel>
-@foreach (var img in GM.Pictures)
+
+@* @foreach (var img in GM.Pictures)
 {
     var bla = Convert.ToBase64String(img.Content);
     <RadzenImage Path="@ToBase64DataUri(img)" />
-}
+} *@
 
+<RadzenStack>
+    <RadzenLabel Text="Select Outcome" />
+    <RadzenDropDown TValue="string"
+    Value="@SelectedEnum.ToString()"
+    Data="@Enum.GetNames(typeof(Review))"
+    Change="@(args => SelectedEnum = Enum.Parse<Review>(args.ToString()))"
+    Style="width: 100%; max-width: 400px;"
+    Name="GuideTypeDropdown" />
+    <RadzenButton Click="RegisterDecision" Style="max-width:400px;">Send Decision: @SelectedEnum.ToString()</RadzenButton>
+</RadzenStack>
 
 @code
 {
     [Parameter]
     public required GuideModel GM { get; set; }
 
+    private Review SelectedEnum;
+
+    private List<Review> reviewlist = new();
+
+    private List<string> DropDownList;
+
     protected override Task OnInitializedAsync()
     {
+        DropDownList = new();
+        if (GM != null)
+        {
+            SelectedEnum = GM.Status;
+        }
+        foreach (Review rv in (Review[])Enum.GetValues(typeof(Review)))
+        {
+            DropDownList.Add(rv.ToString());
+        }
+
         return base.OnInitializedAsync();
     }
     public string ToBase64DataUri(ImageModel img)
     {
         return $"data:{img.ContentType};base64,{Convert.ToBase64String(img.Content)}";
+    }
+    // TODO: Fix so that it goes back to the inspection list again
+    private async Task RegisterDecision()
+    {
+        GM.Status = SelectedEnum;
+        var response = await client.PostAsJsonAsync("/Review-Decision", GM);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Console.WriteLine($"Response Content: {responseContent}");
+        StateHasChanged();
     }
 }

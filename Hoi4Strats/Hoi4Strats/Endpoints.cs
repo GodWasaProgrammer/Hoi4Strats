@@ -39,6 +39,20 @@ public static class Endpoints
             return Results.Ok("Guide created successfully");
         });
 
+        app.MapPost("/Review-Decision", async (GuideModel guide, DBService dbService) =>
+        {
+            var res = await dbService.ReviewDecisionAsync(guide);
+
+            if (res.Equals(guide))
+            {
+                return Results.Ok("successfully updated guide");
+            }
+            else
+            {
+                return Results.BadRequest("Something went wrong updating your decision");
+            }
+        });
+
         //app.MapPost("/create-guide", async (GuideModel guide, DBService dbService) =>
         //{
         //    await dbService.CreateGuide(guide);

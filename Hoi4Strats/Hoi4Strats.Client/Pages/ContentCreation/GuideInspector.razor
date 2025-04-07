@@ -5,35 +5,38 @@
 @using System.Text.Json
 
 <h3>GuideInspector</h3>
-@if (!GuideSelected)
-{
-    <h2>This is where Guide Administrator approve Guides/Templates</h2>
-    <div>
-        <RadzenText>Templates</RadzenText>
-        <RadzenDataGrid @ref="templateGrid" TItem="GuideModel" Data="@TemplatesToInspect" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="5" RowClick="OnTemplateGuideClicked">
-            <Columns>
-                <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
-                <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
-            </Columns>
-        </RadzenDataGrid>
-    </div>
+<AuthorizeView Roles="Admin, GuideAdmin">
 
-    <div>
-        <RadzenText>Countries</RadzenText>
-        <RadzenDataGrid TItem="GuideModel" Data="@CountryGuidesToInspect" AllowPaging="true" PageSize="5" RowClick="OnCountryGuideClicked">
-            <Columns>
-                <RadzenDataGridColumn Property="@nameof(GuideModel.Title)" Title="Title" />
-                <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
-                <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
-            </Columns>
-        </RadzenDataGrid>
-    </div>
-}
-@if (GuideSelected)
-{
-    <Inspector GM="@_GM" />
-}
-@* <RadzenText>@TemplatesToInspect.Count</RadzenText> *@
+    @if (!GuideSelected)
+    {
+        <h2>This is where Guide Administrator approve Guides/Templates</h2>
+        <div>
+            <RadzenText>Templates</RadzenText>
+            <RadzenDataGrid @ref="templateGrid" TItem="GuideModel" Data="@TemplatesToInspect" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="5" RowClick="OnTemplateGuideClicked">
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
+                    <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+
+        <div>
+            <RadzenText>Countries</RadzenText>
+            <RadzenDataGrid TItem="GuideModel" Data="@CountryGuidesToInspect" AllowPaging="true" PageSize="5" RowClick="OnCountryGuideClicked">
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(GuideModel.Title)" Title="Title" />
+                    <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
+                    <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+    }
+    @if (GuideSelected)
+    {
+        <Inspector GM="@_GM" />
+    }
+</AuthorizeView>
+
 @code
 {
     List<GuideModel> CountryGuidesToInspect = new();
@@ -87,13 +90,16 @@
 
         foreach (var guide in guides)
         {
-            if (guide.GuideType == GuideTypes.Country)
+            if (guide.Status == Review.UnderReview)
             {
-                CountryGuidesToInspect.Add(guide);
-            }
-            if (guide.GuideType == GuideTypes.AirTemplate || guide.GuideType == GuideTypes.LandTemplate || guide.GuideType == GuideTypes.NavalTemplate)
-            {
-                TemplatesToInspect.Add(guide);
+                if (guide.GuideType == GuideTypes.Country)
+                {
+                    CountryGuidesToInspect.Add(guide);
+                }
+                if (guide.GuideType == GuideTypes.AirTemplate || guide.GuideType == GuideTypes.LandTemplate || guide.GuideType == GuideTypes.NavalTemplate)
+                {
+                    TemplatesToInspect.Add(guide);
+                }
             }
         }
         //await InvokeAsync(StateHasChanged);
