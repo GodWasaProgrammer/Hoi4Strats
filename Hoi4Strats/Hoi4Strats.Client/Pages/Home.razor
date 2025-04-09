@@ -1,2 +1,33 @@
-﻿@page "/"
+﻿@using Hoi4Strats
+@using Blazored.LocalStorage;
+
+@inject ILocalStorageService ls
+@inject IJSRuntime js
+@page "/"
 <InSiteNewsFeed></InSiteNewsFeed>
+<RenderMode/>
+<script src="/authSync.js"></script>
+
+@code
+{
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && OperatingSystem.IsBrowser())
+        {
+            // 1. Hämta token från cookie (satt av servern)
+            var cookieToken = await js.InvokeAsync<string>("authSync.getCookie", "auth_token");
+
+            if (!string.IsNullOrEmpty(cookieToken))
+            {
+                // 2. Spara i localStorage
+                await ls.SetItemAsync("authToken", cookieToken);
+
+                // 3. Rensa cookie
+                await js.InvokeVoidAsync("authSync.deleteCookie", "auth_token");
+
+                // 4. Uppdatera UI om needed
+                StateHasChanged();
+            }
+        }
+    }
+}

@@ -5,16 +5,16 @@ namespace Hoi4Strats.Client.Services;
 
 public class UserService
 {
-    private readonly HttpClient _httpClient;
+    private readonly AuthenticatedHttpClient _httpClient;
 
-    public UserService(HttpClient httpClient)
+    public UserService(AuthenticatedHttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
     public async Task<List<ApplicationUser>> GetUsersAsync()
     {
-        var result = await _httpClient.GetFromJsonAsync<List<ApplicationUser>>("api/User/GetUsers");
+        var result = await _httpClient.Client.GetFromJsonAsync<List<ApplicationUser>>("api/User/GetUsers");
 
         if (result == null)
         {
@@ -28,7 +28,7 @@ public class UserService
 
     public async Task<List<string>> GetRolesAsync(string userId)
     {
-        var result = await _httpClient.GetFromJsonAsync<List<string>>($"api/User/GetRoles/{userId}");
+        var result = await _httpClient.Client.GetFromJsonAsync<List<string>>($"api/User/GetRoles/{userId}");
 
         if (result == null)
         {
@@ -43,7 +43,7 @@ public class UserService
     public async Task<string> UpdateRolesAsync(string userId, List<string> roles)
     {
         var dto = new UpdateRolesDto { UserId = userId, Roles = roles };
-        var response = await _httpClient.PostAsJsonAsync("api/User/UpdateRoles", dto);
+        var response = await _httpClient.Client.PostAsJsonAsync("api/User/UpdateRoles", dto);
         response.EnsureSuccessStatusCode(); // Kasta ett undantag om svaret inte är framgångsrikt
 
         if (response.IsSuccessStatusCode)
@@ -73,7 +73,7 @@ public class UserService
 
     public async Task<List<string>> GetAllRolesAsync()
     {
-        var result = await _httpClient.GetFromJsonAsync<List<string>>("api/User/GetAllRoles");
+        var result = await _httpClient.Client.GetFromJsonAsync<List<string>>("api/User/GetAllRoles");
 
         if (result == null)
         {

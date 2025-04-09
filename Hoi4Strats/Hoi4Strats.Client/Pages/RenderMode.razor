@@ -1,0 +1,43 @@
+﻿@* RenderModeDetector.razor *@
+<div class="render-mode-info">
+    <h3>Render Mode Information</h3>
+    <p><strong>Current render mode:</strong> @CurrentRenderMode</p>
+    <p><strong>Is prerendering:</strong> @IsPrerendering</p>
+    <p><strong>Is interactive:</strong> @IsInteractive</p>
+    <p><strong>Environment:</strong> @Environment</p>
+</div>
+
+@code {
+    private string CurrentRenderMode => GetRenderMode();
+    private bool IsPrerendering => OperatingSystem.IsBrowser() ? false : !IsInteractive;
+    private bool IsInteractive => GetInteractiveStatus();
+    private string Environment => OperatingSystem.IsBrowser() ? "WebAssembly" : "Server";
+
+    [CascadingParameter]
+    private IComponentRenderMode? CascadedRenderMode { get; set; }
+
+    private string GetRenderMode()
+    {
+        if (OperatingSystem.IsBrowser()) return "Interactive WebAssembly";
+
+        return CascadedRenderMode switch
+        {
+            null => "Static (SSR)",
+            InteractiveServerRenderMode => "Interactive Server",
+            InteractiveWebAssemblyRenderMode => "Interactive WebAssembly",
+            InteractiveAutoRenderMode => "Interactive Auto",
+            _ => "Unknown"
+        };
+    }
+
+    private bool GetInteractiveStatus()
+    {
+        return CascadedRenderMode switch
+        {
+            InteractiveServerRenderMode => true,
+            InteractiveWebAssemblyRenderMode => true,
+            InteractiveAutoRenderMode => true,
+            _ => false
+        };
+    }
+}

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedProj;
+using Blazored.LocalStorage;
 
 namespace Hoi4Strats.Controllers;
 [ApiController]
@@ -14,21 +15,25 @@ public class UserController : ControllerBase
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration? _configuration;
     private readonly ITokenService _tokenService;
+    private readonly ILocalStorageService _localStorage;
 
-    public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration? configuration, ITokenService tokenService)
+    public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration? configuration, ITokenService tokenService, ILocalStorageService localStorage)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
         _tokenService = tokenService;
+        _localStorage = localStorage;
     }
 
+    
     [HttpGet("GetUsers")]
     public async Task<ActionResult<List<ApplicationUser>>> GetUsers()
     {
         return Ok(await _userManager.Users.ToListAsync());
     }
 
+   
     [HttpGet("GetRoles/{userId}")]
     public async Task<ActionResult<List<string>>> GetRoles(string userId)
     {
@@ -75,6 +80,9 @@ public class UserController : ControllerBase
         {
             var roles = await _userManager.GetRolesAsync(user);
             var token = _tokenService.GenerateToken(user.Id, roles.ToList());
+            // locally store the token
+            await _localStorage.SetItemAsync($"authToken_{user.Id}", token);
+            Console.WriteLine($"Token written for:{user.Id}");
 
             return Ok(new { Token = token });
         }

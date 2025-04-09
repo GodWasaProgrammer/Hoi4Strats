@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Hoi4Strats.Client.Services;
 using Hoi4Strats.Components;
 using Hoi4Strats.Components.Account;
@@ -12,6 +13,8 @@ using Microsoft.IdentityModel.Tokens;
 using Radzen;
 using SharedProj;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace Hoi4Strats;
 
@@ -49,7 +52,7 @@ public class Program
         builder.Services.AddScoped<IdentityRedirectManager>();
         builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
         var dbServiceString = DButils.GetConnectionString();
-
+        builder.Services.AddSingleton<TokenService>();
         builder.Services.AddScoped<DBService>(provider => new DBService(dbServiceString));
         builder.Services.AddScoped<UserService>();
         builder.Services.AddRadzenComponents().AddScoped<ThemeService>().AddScoped<NotificationService>();
@@ -87,7 +90,16 @@ public class Program
         });
 
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
+        builder.Services.AddBlazoredLocalStorage(config =>
+        {
+            config.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+            config.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            config.JsonSerializerOptions.IgnoreReadOnlyProperties = true;
+            config.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            config.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            config.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
+            config.JsonSerializerOptions.WriteIndented = false;
+        });
         // .NET 9 setup of TLS 1.2
         builder.Services.AddScoped(sp =>
         {
@@ -124,11 +136,23 @@ public class Program
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
         builder.Services.AddScoped<DialogService>();
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddSignalR(options =>
         {
             options.EnableDetailedErrors = true;
         })
 .AddJsonProtocol();
+        builder.Services.AddScoped<AuthMsgHandler>();
+        builder.Services.AddScoped<AuthenticatedHttpClient>(sp =>
+        {
+            var handler = sp.GetRequiredService<AuthMsgHandler>();
+            handler.InnerHandler = new HttpClientHandler();
+
+            return new AuthenticatedHttpClient(new HttpClient(handler)
+            {
+                BaseAddress = new Uri("https://localhost:7141/")
+            });
+        });
 
         var app = builder.Build();
         app.UseCors(policy =>

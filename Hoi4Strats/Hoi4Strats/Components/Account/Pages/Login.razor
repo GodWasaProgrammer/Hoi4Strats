@@ -1,17 +1,24 @@
 ﻿@page "/Account/Login"
 
 @using System.ComponentModel.DataAnnotations
+@using Hoi4Strats.Services
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using SharedProj
+@using Blazored.LocalStorage;
+@using Hoi4Strats.Client.Pages
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject UserManager<ApplicationUser> userManager
+@inject TokenService ts
+@inject ILocalStorageService localStorage
+@inject IJSRuntime js
 
 <PageTitle>Log in</PageTitle>
-
+<RenderMode/>
 <h1>Log in</h1>
 <div class="row">
     <div class="col-md-4">
@@ -87,30 +94,63 @@
 
     public async Task LoginUser()
     {
-        // This doesn't count login failures towards account lockout
-        // To enable password failures to trigger account lockout, set lockoutOnFailure: true
         var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
         if (result.Succeeded)
         {
-            Logger.LogInformation("User logged in.");
+            var user = await userManager.FindByEmailAsync(Input.Email);
+            var roles = await userManager.GetRolesAsync(user);
+            var token = ts.GenerateToken(user.Id,(List<string>)roles); // Din befintliga token-generering
+
+            // Skicka token som en HttpOnly cookie
+            HttpContext.Response.Cookies.Append(
+                "auth_token",
+                token,
+                new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTimeOffset.Now.AddHours(1)
+                    });
+
             RedirectManager.RedirectTo(ReturnUrl);
         }
-        else if (result.RequiresTwoFactor)
-        {
-            RedirectManager.RedirectTo(
-                "Account/LoginWith2fa",
-                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
-        }
-        else if (result.IsLockedOut)
-        {
-            Logger.LogWarning("User account locked out.");
-            RedirectManager.RedirectTo("Account/Lockout");
-        }
-        else
-        {
-            errorMessage = "Error: Invalid login attempt.";
-        }
+        // ... befintlig felhantering ...
     }
+
+    // public async Task LoginUser()
+    // {
+    //     // This doesn't count login failures towards account lockout
+    //     // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+    //     var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+    //     if (result.Succeeded)
+    //     {
+            
+    //         Logger.LogInformation("User logged in.");
+            
+    //         //var token = ts.GenerateToken(user.Id, roles.ToList());
+    //         // locally store the token
+    //        // await _localStorage.SetItemAsync($"authToken_{user.Id}", token);
+    //         //Console.WriteLine($"Token written for:{user.Id}");
+    //         RedirectManager.RedirectTo(ReturnUrl);
+    //     }
+    //     else if (result.RequiresTwoFactor)
+    //     {
+    //         RedirectManager.RedirectTo(
+    //             "Account/LoginWith2fa",
+    //             new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+    //     }
+    //     else if (result.IsLockedOut)
+    //     {
+    //         Logger.LogWarning("User account locked out.");
+    //         RedirectManager.RedirectTo("Account/Lockout");
+    //     }
+    //     else
+    //     {
+    //         errorMessage = "Error: Invalid login attempt.";
+    //     }
+    // }
 
     private sealed class InputModel
     {
