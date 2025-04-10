@@ -1,0 +1,38 @@
+﻿@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Identity
+@using SharedProj
+@inject IJSRuntime JS
+@inject ILocalStorageService LocalStorage
+
+<h3>Auth Debugger</h3>
+
+<p>Cookie Token: @_cookieToken</p>
+<p>LocalStorage Token: @_localStorageToken</p>
+<p>Status: @_status</p>
+
+@code {
+    private string? _cookieToken;
+    private string? _localStorageToken;
+    private string _status = "Ej kontrollerad";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && OperatingSystem.IsBrowser())
+        {
+            try
+            {
+                _cookieToken = await JS.InvokeAsync<string>("authSync.getCookie", "auth_token");
+                _localStorageToken = await LocalStorage.GetItemAsync<string>("authToken");
+                _status = _localStorageToken != null ? "OK - Token finns i localStorage" : "Ingen token hittad";
+                StateHasChanged();
+
+                // Manuell verifiering i konsolen
+                await JS.InvokeVoidAsync("console.log", "[DebugAuth] Token:", _localStorageToken);
+            }
+            catch (Exception ex)
+            {
+                _status = $"Fel: {ex.Message}";
+            }
+        }
+    }
+}

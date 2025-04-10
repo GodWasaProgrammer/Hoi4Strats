@@ -17,6 +17,8 @@
 @inject ILocalStorageService localStorage
 @inject IJSRuntime js
 
+@* @rendermode @(new InteractiveServerRenderMode(prerender:true)) *@
+
 <PageTitle>Log in</PageTitle>
 <RenderMode/>
 <h1>Log in</h1>
@@ -85,11 +87,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (HttpMethods.IsGet(HttpContext.Request.Method))
-        {
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-        }
+        // if (HttpMethods.IsGet(HttpContext.Request.Method))
+        // {
+        //     // Clear the existing external cookie to ensure a clean login process
+        //     await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        // }
     }
 
     public async Task LoginUser()
@@ -108,7 +110,7 @@
                 token,
                 new CookieOptions
                     {
-                        HttpOnly = true,
+                        HttpOnly = false,
                         Secure = true,
                         SameSite = SameSiteMode.Strict,
                         Expires = DateTimeOffset.Now.AddHours(1)

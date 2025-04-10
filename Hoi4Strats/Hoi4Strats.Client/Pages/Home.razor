@@ -6,16 +6,22 @@
 @page "/"
 <InSiteNewsFeed></InSiteNewsFeed>
 <RenderMode/>
+<DebugAuth></DebugAuth>
 <script src="/authSync.js"></script>
 
 @code
 {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && OperatingSystem.IsBrowser())
+        if (firstRender)
         {
             // 1. Hämta token från cookie (satt av servern)
             var cookieToken = await js.InvokeAsync<string>("authSync.getCookie", "auth_token");
+
+            if(cookieToken == null)
+            {
+                Console.WriteLine("CookieToken Was null :(");
+            }
 
             if (!string.IsNullOrEmpty(cookieToken))
             {
