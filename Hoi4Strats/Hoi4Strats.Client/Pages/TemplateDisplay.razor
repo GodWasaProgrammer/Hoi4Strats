@@ -1,0 +1,28 @@
+﻿@using SharedProj.DBModels
+<RadzenPanel>
+    <RadzenStack>
+
+        <RadzenLabel Text="@GuideModel.Title" />
+        <RadzenHtml>
+            @((MarkupString)GuideModel.Content)
+        </RadzenHtml>
+        @foreach (var img in GuideModel.Pictures)
+        {
+            var bla = ToBase64DataUri(img);
+            <RadzenImage Path="@bla" Style="width:300px; height:300px;" />
+        }
+        <RadzenText>Designed By:@GuideModel.Author</RadzenText>
+        <RadzenText>Created: @GuideModel.CreatedAt</RadzenText>
+    </RadzenStack>
+</RadzenPanel>
+
+@code
+{
+    [Parameter]
+    public GuideModel? GuideModel { get; set; }
+
+    public string ToBase64DataUri(ImageModel img)
+    {
+        return $"data:{img.ContentType};base64,{Convert.ToBase64String(img.Content)}";
+    }
+}
