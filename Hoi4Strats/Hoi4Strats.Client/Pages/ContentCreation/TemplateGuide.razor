@@ -69,12 +69,15 @@
     private string? _submissionFeedBack;
     private string _title = "";
 
+    [Parameter]
+    public Action<bool> ResetGuide { get; set; } 
+
     private async Task SubmitTemplateGuide()
     {
         if (explanationText != "" && _title != "")
         {
             var user = AuthProvider.GetAuthenticationStateAsync();
-            
+
             var newGuide = new GuideModel
                 {
                     Id = 0,
@@ -93,6 +96,7 @@
             var response = await client.PostAsJsonAsync("/create-guide", newGuide);
             var responseContent = await response.Content.ReadAsStringAsync();
             Console.WriteLine($"Response Content: {responseContent}");
+            ResetGuide?.Invoke(response.IsSuccessStatusCode);
         }
         else
         {

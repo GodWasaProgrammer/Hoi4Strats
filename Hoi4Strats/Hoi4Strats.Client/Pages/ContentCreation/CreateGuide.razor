@@ -10,6 +10,7 @@
 @using Radzen
 @inject HttpClient client;
 @inject AuthenticationStateProvider authProvider
+@inject NotificationService NotificationService
 <h3>Create Guide</h3>
 
 <RadzenStack>
@@ -27,7 +28,7 @@
 
     @if (typeOfGuide == GuideTypes.LandTemplate || typeOfGuide == GuideTypes.AirTemplate || typeOfGuide == GuideTypes.NavalTemplate)
     {
-        <TemplateGuide typeOfGuide="typeOfGuide" />
+        <TemplateGuide typeOfGuide="typeOfGuide" ResetGuide="CleanUp"/>
     }
 
     <RadzenStack>
@@ -95,7 +96,7 @@
         };
         await base.OnInitializedAsync();
     }
-    
+
     private async Task SubmitGuide()
     {
         var user = authProvider.GetAuthenticationStateAsync();
@@ -111,6 +112,37 @@
 
         var response = await client.PostAsJsonAsync("/create-guide", newGuide);
         var responseContent = await response.Content.ReadAsStringAsync();
+        CleanUp(response.IsSuccessStatusCode);
         Console.WriteLine($"Response Content: {responseContent}");
+    }
+
+    private void CleanUp(bool success)
+    {
+        typeOfGuide = GuideTypes.Select;
+        landTemplate = LandTemplate.Infantry;
+        htmlValue = @"<h2 style=""text-align:center"">Din guide här</h2>";
+        string Title = "";
+        // Kontrollera resultatet och visa notifiering
+        if (success)
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guide Submission",
+                    Detail = "Guide have been submitted Successfully.",
+                    Duration = 4000
+                });
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Update Failed",
+                    Detail = $"Failed to create your guide submission",
+                    Duration = 4000
+                });
+        }
+        StateHasChanged();
     }
 }
