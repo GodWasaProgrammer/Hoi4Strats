@@ -4,13 +4,13 @@
 
 @if (_isLoading)
 {
-        <span>Laddar roller...</span>
+    <span>Laddar roller...</span>
 }
 else
 {
     @if (_roles != null)
-    {   
-        @if(_roles.Count > 0)
+    {
+        @if (_roles.Count > 0)
         {
             <span>@string.Join(", ", _roles)</span>
         }
@@ -29,9 +29,11 @@ else
     private List<string>? _roles;
     private bool _isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstrender)
     {
+
         await LoadRolesAsync();
+        await InvokeAsync(StateHasChanged);
     }
 
     public async Task RefreshRoles()

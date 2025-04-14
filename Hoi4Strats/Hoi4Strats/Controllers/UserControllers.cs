@@ -26,14 +26,14 @@ public class UserController : ControllerBase
         _localStorage = localStorage;
     }
 
-    
+    [Authorize (Roles = "Admin")]
     [HttpGet("GetUsers")]
     public async Task<ActionResult<List<ApplicationUser>>> GetUsers()
     {
         return Ok(await _userManager.Users.ToListAsync());
     }
 
-   
+    [Authorize(Roles = "Admin")]
     [HttpGet("GetRoles/{userId}")]
     public async Task<ActionResult<List<string>>> GetRoles(string userId)
     {
@@ -65,6 +65,7 @@ public class UserController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("GetAllRoles")]
     public async Task<ActionResult<List<string>>> GetAllRoles()
     {
@@ -72,6 +73,7 @@ public class UserController : ControllerBase
         return Ok(roles);
     }
 
+    [Obsolete] // Login goes via identity pages
     [HttpPost("Login")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
