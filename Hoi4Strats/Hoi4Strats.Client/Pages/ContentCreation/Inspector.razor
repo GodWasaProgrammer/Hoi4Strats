@@ -30,18 +30,21 @@ else
 <RadzenStack>
     <RadzenLabel Text="Select Outcome" />
     <RadzenDropDown TValue="string"
-                    Value="@SelectedEnum.ToString()"
-                    Data="@Enum.GetNames(typeof(Review))"
-                    Change="@(args => SelectedEnum = Enum.Parse<Review>(args.ToString()))"
-                    Style="width: 100%; max-width: 400px;"
-                    Name="GuideTypeDropdown" />
+    Value="@SelectedEnum.ToString()"
+    Data="@Enum.GetNames(typeof(Review))"
+    Change="@(args => SelectedEnum = Enum.Parse<Review>(args.ToString()))"
+    Style="width: 100%; max-width: 400px;"
+    Name="GuideTypeDropdown" />
     <RadzenButton Click="RegisterDecision" Style="max-width:400px;">Send Decision: @SelectedEnum.ToString()</RadzenButton>
 </RadzenStack>
 
 @code
 {
     [Parameter]
-    public required GuideModel GM { get; set; }
+    public required GuideModel? GM { get; set; }
+
+    [Parameter]
+    public Action? ResetSelection { get; set; }
 
     private Review SelectedEnum;
 
@@ -74,6 +77,7 @@ else
         var response = await client.PostAsJsonAsync("/Review-Decision", GM);
         var responseContent = await response.Content.ReadAsStringAsync();
         Console.WriteLine($"Response Content: {responseContent}");
+        ResetSelection?.Invoke();
         StateHasChanged();
     }
 }

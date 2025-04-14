@@ -33,7 +33,7 @@
     }
     @if (GuideSelected)
     {
-        <Inspector GM="@_GM" />
+        <Inspector GM="@_GM" ResetSelection="ResetSelection" />
     }
 </AuthorizeView>
 
@@ -44,6 +44,14 @@
     private RadzenDataGrid<GuideModel>? templateGrid;
     private bool GuideSelected = false;
     private GuideModel? _GM;
+
+    private async void ResetSelection()
+    {
+        GuideSelected = false;
+        _GM = null;
+        await PageSetUp();
+        StateHasChanged();
+    }
 
     private async Task<List<GuideModel>> FetchReviewGuides()
     {
@@ -80,10 +88,8 @@
         return new List<GuideModel>();
     }
 
-    protected override async Task OnInitializedAsync()
+    private async Task PageSetUp()
     {
-        // TemplatesToInspect.Add(dummyGuide);
-        // CountryGuidesToInspect.Add(dummyCountryGuide);
         var guides = await FetchReviewGuides();
         TemplatesToInspect = new();
         CountryGuidesToInspect = new();
@@ -102,43 +108,22 @@
                 }
             }
         }
-        //await InvokeAsync(StateHasChanged);
-        //await templateGrid.Reload();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await PageSetUp();
     }
     private void OnTemplateGuideClicked(DataGridRowMouseEventArgs<GuideModel> ClickedGuide)
     {
-        // Hantera klicket, t.ex. navigera till trådar i den här kategorin
         Console.WriteLine($"Clicked on Template Guide: {ClickedGuide.Data.Author}");
         _GM = ClickedGuide.Data;
         GuideSelected = true;
-        // NavigationManager.NavigateTo($"/forum/category/{category.ID}");
     }
     private void OnCountryGuideClicked(DataGridRowMouseEventArgs<GuideModel> ClickedGuide)
     {
-        // Hantera klicket, t.ex. navigera till trådar i den här kategorin
         Console.WriteLine($"Clicked on Country Guide: {ClickedGuide.Data.Author}");
         _GM = ClickedGuide.Data;
         GuideSelected = true;
-        // NavigationManager.NavigateTo($"/forum/category/{category.ID}");
     }
-    // GuideModel dummyGuide = new GuideModel
-    //     {
-    //         Id = 1,
-    //         Content = "Det här är ett exempel på innehåll för en guide.",
-    //         Author = "Test Författare",
-    //         Title = "Template Testing",
-    //     // Pictures = "dummy-image-url.jpg",
-    //         CreatedAt = DateTime.Now,
-    //         GuideType = GuideTypes.AirTemplate
-    //     };
-
-    // GuideModel dummyCountryGuide = new GuideModel
-    //     {
-    //         Id = 1,
-    //         Content = "bla bla",
-    //         Author = "Sven",
-    //         CreatedAt = DateTime.Now,
-    //         Title = "Peak Germany",
-    //         GuideType = GuideTypes.Country
-    //     };
 }
