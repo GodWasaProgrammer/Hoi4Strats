@@ -1,6 +1,8 @@
 ﻿@using SharedProj
 @using Hoi4Strats.Client.Services
+@using System.Security.Claims
 @inject UserService UService
+@inject AuthenticationStateProvider AuthStateProvider
 
 @if (_isLoading)
 {
@@ -31,9 +33,32 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstrender)
     {
-
-        await LoadRolesAsync();
-        await InvokeAsync(StateHasChanged);
+        if (firstrender)
+        {
+            var bla = await AuthStateProvider.GetAuthenticationStateAsync();
+            if (bla.User != null)
+            {
+                if (bla.User.Identity != null)
+                {
+                    if (bla.User.Identity.IsAuthenticated)
+                    {
+                        _roles = new();
+                        var roles = bla.User.Claims.ToList();
+                        foreach (var role in roles)
+                        {
+                            if (role.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")
+                            {
+                                var rolex = role.Value;
+                                _roles.Add(rolex);
+                            }
+                        }
+                    }
+                }
+            }
+            //await LoadRolesAsync();
+            _isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     public async Task RefreshRoles()
