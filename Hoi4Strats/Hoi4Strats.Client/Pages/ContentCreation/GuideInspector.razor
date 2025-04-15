@@ -7,29 +7,60 @@
 <h3>GuideInspector</h3>
 <AuthorizeView Roles="Admin, GuideAdmin">
 
+    <h3>This is where Guide Administrator approve Guides/Templates</h3>
     @if (!GuideSelected)
     {
-        <h2>This is where Guide Administrator approve Guides/Templates</h2>
-        <div>
-            <RadzenText>Templates</RadzenText>
-            <RadzenDataGrid @ref="templateGrid" TItem="GuideModel" Data="@TemplatesToInspect" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="5" RowClick="OnTemplateGuideClicked">
-                <Columns>
-                    <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
-                    <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
-                </Columns>
-            </RadzenDataGrid>
-        </div>
+        <RadzenButton Click="ToggleUnderReview">View Pending Reviews</RadzenButton>
+        <RadzenButton Click="ToggleApproved">View Approved Guides</RadzenButton>
+        <RadzenButton Click="ToggleRejected">View Rejected Guides</RadzenButton>
+        @if (_viewApprovedGuides)
+        {
+            <div>
+                <RadzenText>approved guides</RadzenText>
+                <RadzenDataGrid TItem="GuideModel" Data="@ApprovedGuides" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="pagesize" RowClick="OnTemplateGuideClicked">
+                    <Columns>
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+                    </Columns>
+                </RadzenDataGrid>
+            </div>
+        }
+        @if (_viewUnderReviewGuides)
+        {
+            <div>
+                <RadzenText>Templates</RadzenText>
+                <RadzenDataGrid @ref="templateGrid" TItem="GuideModel" Data="@TemplatesToInspect" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="pagesize" RowClick="OnTemplateGuideClicked">
+                    <Columns>
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+                    </Columns>
+                </RadzenDataGrid>
+            </div>
 
-        <div>
-            <RadzenText>Countries</RadzenText>
-            <RadzenDataGrid TItem="GuideModel" Data="@CountryGuidesToInspect" AllowPaging="true" PageSize="5" RowClick="OnCountryGuideClicked">
-                <Columns>
-                    <RadzenDataGridColumn Property="@nameof(GuideModel.Title)" Title="Title" />
-                    <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
-                    <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
-                </Columns>
-            </RadzenDataGrid>
-        </div>
+            <div>
+                <RadzenText>Countries</RadzenText>
+                <RadzenDataGrid TItem="GuideModel" Data="@CountryGuidesToInspect" AllowPaging="true" PageSize="pagesize" RowClick="OnCountryGuideClicked">
+                    <Columns>
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.Title)" Title="Title" />
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+                    </Columns>
+                </RadzenDataGrid>
+            </div>
+        }
+        @if(_viewRejectedGuides)
+        {
+            <div>
+                <RadzenText>Templates</RadzenText>
+                <RadzenDataGrid TItem="GuideModel" Data="@RejectGuides" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="pagesize" RowClick="OnTemplateGuideClicked">
+                    <Columns>
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+                    </Columns>
+                </RadzenDataGrid>
+            </div>
+        }
+
     }
     @if (GuideSelected)
     {
@@ -40,10 +71,38 @@
 @code
 {
     List<GuideModel> CountryGuidesToInspect = new();
+    List<GuideModel> ApprovedGuides;
+    List<GuideModel> RejectGuides;
     List<GuideModel> TemplatesToInspect = new();
     private RadzenDataGrid<GuideModel>? templateGrid;
     private bool GuideSelected = false;
     private GuideModel? _GM;
+    private Review review;
+    private int pagesize = 20;
+
+    private bool _viewApprovedGuides;
+    private void ToggleApproved()
+    {
+        _viewUnderReviewGuides = false;
+        _viewRejectedGuides = false;
+        _viewApprovedGuides = !_viewApprovedGuides;
+    }
+
+    private bool _viewUnderReviewGuides;
+    private void ToggleUnderReview()
+    {
+        _viewApprovedGuides = false;
+        _viewRejectedGuides = false;
+        _viewUnderReviewGuides = !_viewUnderReviewGuides;
+    }
+
+    private bool _viewRejectedGuides;
+    private void ToggleRejected()
+    {
+        _viewApprovedGuides = false;
+        _viewUnderReviewGuides = false;
+        _viewRejectedGuides = !_viewRejectedGuides;
+    }
 
     private async void ResetSelection()
     {
@@ -93,6 +152,8 @@
         var guides = await FetchReviewGuides();
         TemplatesToInspect = new();
         CountryGuidesToInspect = new();
+        RejectGuides = new();
+        ApprovedGuides = new();
 
         foreach (var guide in guides)
         {
@@ -106,6 +167,14 @@
                 {
                     TemplatesToInspect.Add(guide);
                 }
+            }
+            if (guide.Status == Review.Approved)
+            {
+                ApprovedGuides.Add(guide);
+            }
+            if (guide.Status == Review.Rejected)
+            {
+                RejectGuides.Add(guide);
             }
         }
     }

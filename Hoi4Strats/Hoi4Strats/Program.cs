@@ -76,13 +76,6 @@ public class Program
             // Tokens
             .AddDefaultTokenProviders();
         builder.Services.AddScoped<ITokenService, TokenService>();
-
-        //builder.Services.ConfigureApplicationCookie(options =>
-        //{
-        //    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Demand HTTPS
-        //    options.Cookie.SameSite = SameSiteMode.Lax; // Hindrar otillåtna begäran mellan sidor
-        //    options.Cookie.HttpOnly = true; // Gör cookien otillgänglig för JavaScript
-        //});
         builder.Services.Configure<CookiePolicyOptions>(options =>
         {
             options.MinimumSameSitePolicy = SameSiteMode.Lax; // Eller Strict beroende på behov
@@ -119,20 +112,6 @@ public class Program
                 BaseAddress = new Uri("https://localhost:7141/")
             };
         });
-        //builder.Services.AddHttpClient("MyHttpClient", client =>
-        //{
-        //    client.BaseAddress = new Uri("https://localhost:7141/");
-        //});
-        //.ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
-        //{
-        //    UseCookies = true,
-        //    Credentials = System.Net.CredentialCache.DefaultCredentials,
-        //    SslOptions = new System.Net.Security.SslClientAuthenticationOptions
-        //    {
-        //        EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
-        //    }
-        //});
-
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
         builder.Services.AddScoped<DialogService>();

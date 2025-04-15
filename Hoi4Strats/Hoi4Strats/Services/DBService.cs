@@ -16,7 +16,7 @@ public class DBService
 
     public async Task CreateGuide(GuideModel guideIn)
     {
-        var guideQuery = "INSERT INTO Guides (Title, Content, Author, CreatedAt, GuideType) OUTPUT INSERTED.Id VALUES (@Title, @Content, @Author, @CreatedAt, @GuideType)";
+        var guideQuery = "INSERT INTO Guides (Title, Content, Author, CreatedAt, GuideType, MajorCountry,MinorCountry) OUTPUT INSERTED.Id VALUES (@Title, @Content, @Author, @CreatedAt, @GuideType, @MajorCountry, @MinorCountry)";
         var imageQuery = "INSERT INTO Images (Name, Content, ContentType, CreatedAt, GuideId) VALUES (@Name, @Content, @ContentType, @CreatedAt, @GuideId)";
 
         try
@@ -37,7 +37,8 @@ public class DBService
                     guideCommand.Parameters.Add("@Author", SqlDbType.NVarChar).Value = guideIn.Author;
                     guideCommand.Parameters.Add("@CreatedAt", SqlDbType.DateTime).Value = DateTime.UtcNow;
                     guideCommand.Parameters.Add("@GuideType", SqlDbType.Int).Value = (int)guideIn.GuideType; // Konvertera enum till int
-
+                    guideCommand.Parameters.Add("@MajorCountry", SqlDbType.Int).Value = (int)guideIn.MajorCountry;
+                    guideCommand.Parameters.Add("@MinorCountry", SqlDbType.Int).Value = (int)guideIn.MinorCountry;
                     object? result = await guideCommand.ExecuteScalarAsync() ?? throw new InvalidOperationException("The Query did not return a value");
                     guideId = (int)result;
                 }
@@ -87,7 +88,9 @@ public class DBService
             Content = @Content,
             Author = @Author,
             GuideType = @GuideType,
-            Status = @Status
+            Status = @Status,
+            MajorCountry = @MajorCountry,
+            MinorCountry = @MinorCountry
         WHERE Id = @Id";
 
         try
@@ -102,6 +105,8 @@ public class DBService
             command.Parameters.AddWithValue("@GuideType", (int)guideToUpdate.GuideType);
             command.Parameters.AddWithValue("@Status", guideToUpdate.Status);
             command.Parameters.AddWithValue("@Id", guideToUpdate.Id);
+            command.Parameters.AddWithValue("@MajorCountry", guideToUpdate.MajorCountry);
+            command.Parameters.AddWithValue("@MinorCountry", guideToUpdate.MinorCountry);
 
             var rowsAffected = await command.ExecuteNonQueryAsync();
 
@@ -127,7 +132,7 @@ public class DBService
     public async Task<List<GuideModel>> GetGuides()
     {
         var guides = new List<GuideModel>();
-        var query = "SELECT Id, Title, Content, Author, CreatedAt, Status, GuideType FROM Guides";
+        var query = "SELECT Id, Title, Content, Author, CreatedAt, Status, GuideType, MajorCountry, MinorCountry FROM Guides";
 
         using (var connection = new SqlConnection(_connectionString))
         {
@@ -145,7 +150,9 @@ public class DBService
                     Author = reader.GetString(3),
                     CreatedAt = reader.GetDateTime(4),
                     Status = (Review)reader.GetInt32(5),
-                    GuideType = (GuideTypes)reader.GetInt32(6) // Konvertera int till enum
+                    GuideType = (GuideTypes)reader.GetInt32(6), // Konvertera int till enum
+                    MajorCountry =(Majors)reader.GetInt32(7),
+                    MinorCountry =(Minors)reader.GetInt32(8)
                 };
                 guide.Pictures = await GetPicturesForGuide(guide.Id);
                 guides.Add(guide);

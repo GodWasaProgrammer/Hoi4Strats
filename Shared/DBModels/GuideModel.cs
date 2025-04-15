@@ -6,6 +6,8 @@ public class GuideModel
     public required string Title { get; set; } // Guidens titel
     public required string Content { get; set; } // Guidens innehåll
     public required string Author { get; set; } // Namn eller ID för författaren
+    public Majors MajorCountry { get; set; }
+    public Minors MinorCountry { get; set; }
     public DateTime CreatedAt { get; set; } // När guiden skapades
     public List<ImageModel>? Pictures { get; set; } = [];
     public Review Status { get; set; } = Review.UnderReview;

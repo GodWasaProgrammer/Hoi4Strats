@@ -28,27 +28,64 @@
 
     @if (typeOfGuide == GuideTypes.LandTemplate || typeOfGuide == GuideTypes.AirTemplate || typeOfGuide == GuideTypes.NavalTemplate)
     {
-        <TemplateGuide typeOfGuide="typeOfGuide" ResetGuide="CleanUp"/>
+        <TemplateGuide typeOfGuide="typeOfGuide" ResetGuide="CleanUp" />
     }
 
     <RadzenStack>
         @if (typeOfGuide == GuideTypes.Country)
         {
-            @if (Title == "")
+            <RadzenStack>
+                <RadzenLabel Text="Major or Minor?" />
+                <RadzenDropDown TValue="SelectCountryType"
+                Value="@selectCountryType.ToString()"
+                Data="@Enum.GetNames(typeof(SelectCountryType))"
+                Change="@(args => selectCountryType = Enum.Parse<SelectCountryType>(args.ToString()))"
+                Style="width: 100%; max-width: 400px;"
+                Name="majororminor" />
+            </RadzenStack>
+            @if (selectCountryType != SelectCountryType.Select)
             {
-                <RadzenTextBox Style="width:200px" Placeholder="Title?" @bind-Value="@Title"></RadzenTextBox>
-            }
-            @if (Title != "")
-            {
-                <RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput
-                Change=@OnChange
-                Paste=@OnPaste
-                UploadComplete=@OnUploadComplete
-                Execute=@OnExecute
-                UploadUrl="upload/blob"
-                UploadHeaders="@_uploadUrl" />
-                //<EventConsole @ref=@console />
-                <RadzenButton Click="(() => SubmitGuide())">Submit for review</RadzenButton>
+                DecideCountryType();
+                @if (major)
+                {
+                    <RadzenStack>
+                        <RadzenLabel Text="Pick Country" />
+                        <RadzenDropDown TValue="Majors"
+                        Value="@majors.ToString()"
+                        Data="@Enum.GetNames(typeof(Majors))"
+                        Change="@(args => majors = Enum.Parse<Majors>(args.ToString()))"
+                        Style="width: 100%; max-width: 400px;"
+                        Name="majororminor" />
+                    </RadzenStack>
+                }
+                if (minor)
+                {
+                    <RadzenStack>
+                        <RadzenLabel Text="Pick Country" />
+                        <RadzenDropDown TValue="Minors"
+                        Value="@minors.ToString()"
+                        Data="@Enum.GetNames(typeof(Minors))"
+                        Change="@(args => minors = Enum.Parse<Minors>(args.ToString()))"
+                        Style="width: 100%; max-width: 400px;"
+                        Name="majororminor" />
+                    </RadzenStack>
+                }
+                @if (Title == "")
+                {
+                    <RadzenTextBox Style="width:200px" Placeholder="Title?" @bind-Value="@Title"></RadzenTextBox>
+                }
+                @if (Title != "")
+                {
+                    <RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput
+                    Change=@OnChange
+                    Paste=@OnPaste
+                    UploadComplete=@OnUploadComplete
+                    Execute=@OnExecute
+                    UploadUrl="upload/blob"
+                    UploadHeaders="@_uploadUrl" />
+                    //<EventConsole @ref=@console />
+                    <RadzenButton Click="(() => SubmitGuide())">Submit for review</RadzenButton>
+                }
             }
         }
     </RadzenStack>
@@ -61,6 +98,25 @@
     private GuideTypes typeOfGuide = GuideTypes.Select;
     private LandTemplate landTemplate = LandTemplate.Infantry;
     private Dictionary<string, string>? _uploadUrl;
+    private Majors majors;
+    private Minors minors;
+    private SelectCountryType selectCountryType;
+    private bool major;
+    private bool minor;
+
+    private void DecideCountryType()
+    {
+        if (selectCountryType.ToString() == "Majors")
+        {
+            minor = false;
+            major = true;
+        }
+        if (selectCountryType.ToString() == "Minors")
+        {
+            major = false;
+            minor = true;
+        }
+    }
 
     void OnPaste(HtmlEditorPasteEventArgs args)
     {
@@ -92,7 +148,7 @@
     {
         _uploadUrl = new Dictionary<string, string>
         {
-            { "Upload-Session-Id", uploadSessionId } 
+            { "Upload-Session-Id", uploadSessionId }
         };
         await base.OnInitializedAsync();
     }
@@ -109,7 +165,14 @@
                 CreatedAt = DateTime.UtcNow,
                 GuideType = typeOfGuide
             };
-
+        if (major)
+        {
+            newGuide.MajorCountry = majors;
+        }
+        if(minor)
+        {
+            newGuide.MinorCountry = minors;
+        }
         var response = await client.PostAsJsonAsync("/create-guide", newGuide);
         var responseContent = await response.Content.ReadAsStringAsync();
         CleanUp(response.IsSuccessStatusCode);
