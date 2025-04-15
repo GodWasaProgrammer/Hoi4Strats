@@ -2,6 +2,7 @@
 @using SharedProj.DBModels
 @using Hoi4Strats.Client
 @inject HttpClient client
+@inject NotificationService NotificationService
 
 @if (GM.GuideType == GuideTypes.Country)
 {
@@ -18,23 +19,17 @@
 }
 else
 {
-    <TemplateDisplay GuideModel="@GM"/>
+    <TemplateDisplay GuideModel="@GM" />
 }
-
-@* @foreach (var img in GM.Pictures)
-{
-    var bla = Convert.ToBase64String(img.Content);
-    <RadzenImage Path="@ToBase64DataUri(img)" />
-} *@
 
 <RadzenStack>
     <RadzenLabel Text="Select Outcome" />
     <RadzenDropDown TValue="string"
-    Value="@SelectedEnum.ToString()"
-    Data="@Enum.GetNames(typeof(Review))"
-    Change="@(args => SelectedEnum = Enum.Parse<Review>(args.ToString()))"
-    Style="width: 100%; max-width: 400px;"
-    Name="GuideTypeDropdown" />
+                    Value="@SelectedEnum.ToString()"
+                    Data="@Enum.GetNames(typeof(Review))"
+                    Change="@(args => SelectedEnum = Enum.Parse<Review>(args.ToString()))"
+                    Style="width: 100%; max-width: 400px;"
+                    Name="GuideTypeDropdown" />
     <RadzenButton Click="RegisterDecision" Style="max-width:400px;">Send Decision: @SelectedEnum.ToString()</RadzenButton>
 </RadzenStack>
 
@@ -76,6 +71,31 @@ else
         GM.Status = SelectedEnum;
         var response = await client.PostAsJsonAsync("/Review-Decision", GM);
         var responseContent = await response.Content.ReadAsStringAsync();
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Kontrollera resultatet och visa notifiering
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Decision submitted",
+                    Detail = "Your Decision have been submitted Successfully.",
+                    Duration = 4000
+                });
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Update Failed",
+                    Detail = $"Failed to create your guide submission",
+                    Duration = 4000
+                });
+
+            StateHasChanged();
+        }
+
         Console.WriteLine($"Response Content: {responseContent}");
         ResetSelection?.Invoke();
         StateHasChanged();
