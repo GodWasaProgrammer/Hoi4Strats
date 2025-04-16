@@ -10,98 +10,56 @@
     <h3>This is where Guide Administrator approve Guides/Templates</h3>
     @if (!GuideSelected)
     {
-        <RadzenButton Click="ToggleUnderReview">View Pending Reviews</RadzenButton>
-        <RadzenButton Click="ToggleApproved">View Approved Guides</RadzenButton>
-        <RadzenButton Click="ToggleRejected">View Rejected Guides</RadzenButton>
-        @if (_viewApprovedGuides)
-        {
-            <div>
-                <RadzenText>approved guides</RadzenText>
-                <RadzenDataGrid TItem="GuideModel" Data="@ApprovedGuides" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="pagesize" RowClick="OnTemplateGuideClicked">
-                    <Columns>
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
-                    </Columns>
-                </RadzenDataGrid>
-            </div>
-        }
-        @if (_viewUnderReviewGuides)
-        {
-            <div>
-                <RadzenText>Templates</RadzenText>
-                <RadzenDataGrid @ref="templateGrid" TItem="GuideModel" Data="@TemplatesToInspect" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="pagesize" RowClick="OnTemplateGuideClicked">
-                    <Columns>
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
-                    </Columns>
-                </RadzenDataGrid>
-            </div>
+        <RadzenButton Click="(() => ToggleList(_UnderReview))">Pending Reviews</RadzenButton>
+        <RadzenButton Click="(() => ToggleList(ApprovedGuides))">Approved Guides</RadzenButton>
+        <RadzenButton Click="(() => ToggleList(RejectGuides))">Rejected Guides</RadzenButton>
 
+        @if (ViewGuides)
+        {
             <div>
-                <RadzenText>Countries</RadzenText>
-                <RadzenDataGrid TItem="GuideModel" Data="@CountryGuidesToInspect" AllowPaging="true" PageSize="pagesize" RowClick="OnCountryGuideClicked">
+                <RadzenDataGrid TItem="GuideModel" Data="@DisplayList" AllowPaging="true" PageSize="pagesize" RowClick="OnCountryGuideClicked">
                     <Columns>
                         <RadzenDataGridColumn Property="@nameof(GuideModel.Title)" Title="Title" />
                         <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
                         <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.Pictures)" Title="No. Of Pics">
+                            <Template Context="guide">
+                                @guide.Pictures?.Count
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.GuideType)" Title="Type" />
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.MajorCountry)" Title="Major" />
+                        <RadzenDataGridColumn Property="@nameof(GuideModel.MinorCountry)" Title="Minor" />
                     </Columns>
                 </RadzenDataGrid>
             </div>
         }
-        @if(_viewRejectedGuides)
-        {
-            <div>
-                <RadzenText>Templates</RadzenText>
-                <RadzenDataGrid TItem="GuideModel" Data="@RejectGuides" SelectionMode="DataGridSelectionMode.Single" AllowPaging="true" PageSize="pagesize" RowClick="OnTemplateGuideClicked">
-                    <Columns>
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
-                    </Columns>
-                </RadzenDataGrid>
-            </div>
-        }
-
     }
     @if (GuideSelected)
     {
         <Inspector GM="@_GM" ResetSelection="ResetSelection" />
+        <RadzenButton Click="ResetSelection">Cancel</RadzenButton>
     }
 </AuthorizeView>
 
 @code
 {
-    List<GuideModel> CountryGuidesToInspect = new();
-    List<GuideModel> ApprovedGuides;
-    List<GuideModel> RejectGuides;
-    List<GuideModel> TemplatesToInspect = new();
+    List<GuideModel> DisplayList = new();
+    List<GuideModel> ApprovedGuides = new();
+    List<GuideModel> RejectGuides = new();
+    List<GuideModel> _UnderReview = new();
     private RadzenDataGrid<GuideModel>? templateGrid;
     private bool GuideSelected = false;
     private GuideModel? _GM;
     private Review review;
-    private int pagesize = 20;
+    private readonly int pagesize = 20;
 
-    private bool _viewApprovedGuides;
-    private void ToggleApproved()
+    private bool ViewGuides;
+    private void ToggleList(List<GuideModel> ChosenList)
     {
-        _viewUnderReviewGuides = false;
-        _viewRejectedGuides = false;
-        _viewApprovedGuides = !_viewApprovedGuides;
-    }
-
-    private bool _viewUnderReviewGuides;
-    private void ToggleUnderReview()
-    {
-        _viewApprovedGuides = false;
-        _viewRejectedGuides = false;
-        _viewUnderReviewGuides = !_viewUnderReviewGuides;
-    }
-
-    private bool _viewRejectedGuides;
-    private void ToggleRejected()
-    {
-        _viewApprovedGuides = false;
-        _viewUnderReviewGuides = false;
-        _viewRejectedGuides = !_viewRejectedGuides;
+        DisplayList = new();
+        DisplayList = ChosenList;
+        ViewGuides = true;
     }
 
     private async void ResetSelection()
@@ -150,8 +108,7 @@
     private async Task PageSetUp()
     {
         var guides = await FetchReviewGuides();
-        TemplatesToInspect = new();
-        CountryGuidesToInspect = new();
+        _UnderReview = new();
         RejectGuides = new();
         ApprovedGuides = new();
 
@@ -159,14 +116,7 @@
         {
             if (guide.Status == Review.UnderReview)
             {
-                if (guide.GuideType == GuideTypes.Country)
-                {
-                    CountryGuidesToInspect.Add(guide);
-                }
-                if (guide.GuideType == GuideTypes.AirTemplate || guide.GuideType == GuideTypes.LandTemplate || guide.GuideType == GuideTypes.NavalTemplate)
-                {
-                    TemplatesToInspect.Add(guide);
-                }
+                _UnderReview.Add(guide);
             }
             if (guide.Status == Review.Approved)
             {
@@ -183,12 +133,14 @@
     {
         await PageSetUp();
     }
+
     private void OnTemplateGuideClicked(DataGridRowMouseEventArgs<GuideModel> ClickedGuide)
     {
         Console.WriteLine($"Clicked on Template Guide: {ClickedGuide.Data.Author}");
         _GM = ClickedGuide.Data;
         GuideSelected = true;
     }
+
     private void OnCountryGuideClicked(DataGridRowMouseEventArgs<GuideModel> ClickedGuide)
     {
         Console.WriteLine($"Clicked on Country Guide: {ClickedGuide.Data.Author}");

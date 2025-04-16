@@ -10,11 +10,11 @@
     <RadzenStack>
         <RadzenLabel Text="Select Land Template type" />
         <RadzenDropDown TValue="LandTemplate"
-        Value="@landTemplate.ToString()"
-        Data="@Enum.GetNames(typeof(LandTemplate))"
-        Change="@(args => landTemplate = Enum.Parse<LandTemplate>(args.ToString()))"
-        Style="width: 100%; max-width: 400px;"
-        Name="LandTemplateDropdown" />
+                        Value="@landTemplate.ToString()"
+                        Data="@Enum.GetNames(typeof(LandTemplate))"
+                        Change="@(args => landTemplate = Enum.Parse<LandTemplate>(args.ToString()))"
+                        Style="width: 100%; max-width: 400px;"
+                        Name="LandTemplateDropdown" />
     </RadzenStack>
 }
 
@@ -23,11 +23,11 @@
     <RadzenStack>
         <RadzenLabel Text="Select Land Template type" />
         <RadzenDropDown TValue="AirTemplate"
-        Value="@airTemplate.ToString()"
-        Data="@Enum.GetNames(typeof(AirTemplate))"
-        Change="@(args => airTemplate = Enum.Parse<AirTemplate>(args.ToString()))"
-        Style="width: 100%; max-width: 400px;"
-        Name="LandTemplateDropdown" />
+                        Value="@airTemplate.ToString()"
+                        Data="@Enum.GetNames(typeof(AirTemplate))"
+                        Change="@(args => airTemplate = Enum.Parse<AirTemplate>(args.ToString()))"
+                        Style="width: 100%; max-width: 400px;"
+                        Name="LandTemplateDropdown" />
     </RadzenStack>
 }
 
@@ -36,19 +36,18 @@
     <RadzenStack>
         <RadzenLabel Text="Select Naval Template type" />
         <RadzenDropDown TValue="NavalTemplate"
-        Value="@navalTemplate.ToString()"
-        Data="@Enum.GetNames(typeof(NavalTemplate))"
-        Change="@(args => navalTemplate = Enum.Parse<NavalTemplate>(args.ToString()))"
-        Style="width: 100%; max-width: 400px;"
-        Name="LandTemplateDropdown" />
+                        Value="@navalTemplate.ToString()"
+                        Data="@Enum.GetNames(typeof(NavalTemplate))"
+                        Change="@(args => navalTemplate = Enum.Parse<NavalTemplate>(args.ToString()))"
+                        Style="width: 100%; max-width: 400px;"
+                        Name="LandTemplateDropdown" />
     </RadzenStack>
 }
 @if (typeOfGuide == GuideTypes.AirTemplate || typeOfGuide == GuideTypes.LandTemplate || typeOfGuide == GuideTypes.NavalTemplate)
 {
-    @if (_title == "")
-    {
-        <RadzenTextBox Style="width:200px" Placeholder="Title?" @bind-Value="@_title"></RadzenTextBox>
-    }
+
+    <RadzenTextBox Style="width:200px" Placeholder="Title?" @bind-Value="@_title"></RadzenTextBox>
+
     <PictureUploadByteArray Fetchupload="HandleFileUploaded" />
     <RadzenTextArea @bind-Value=@explanationText Style="width:200px" Placeholder="Short Explanatory text" />
 
@@ -70,7 +69,7 @@
     private string _title = "";
 
     [Parameter]
-    public Action<bool> ResetGuide { get; set; } 
+    public Action<bool> ResetGuide { get; set; }
 
     private async Task SubmitTemplateGuide()
     {

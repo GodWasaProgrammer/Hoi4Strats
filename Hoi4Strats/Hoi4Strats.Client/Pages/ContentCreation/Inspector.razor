@@ -28,9 +28,9 @@ else
                     Value="@SelectedEnum.ToString()"
                     Data="@Enum.GetNames(typeof(Review))"
                     Change="@(args => SelectedEnum = Enum.Parse<Review>(args.ToString()))"
-                    Style="width: 100%; max-width: 400px;"
+                    Style="width: 100%; max-width: 200px;"
                     Name="GuideTypeDropdown" />
-    <RadzenButton Click="RegisterDecision" Style="max-width:400px;">Send Decision: @SelectedEnum.ToString()</RadzenButton>
+    <RadzenButton Click="RegisterDecision" Style="max-width:200px;">Send Decision: @SelectedEnum.ToString()</RadzenButton>
 </RadzenStack>
 
 @code

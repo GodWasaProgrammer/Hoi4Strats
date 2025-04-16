@@ -127,8 +127,6 @@ public class DBService
         return guideToUpdate; // Returnera uppdaterat objekt
     }
 
-
-
     public async Task<List<GuideModel>> GetGuides()
     {
         var guides = new List<GuideModel>();
