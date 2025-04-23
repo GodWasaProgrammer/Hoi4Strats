@@ -3,6 +3,8 @@ using Hoi4Strats.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Radzen;
+using FindRazorSourceFile.WebAssembly;
+
 namespace Hoi4Strats.Client;
 
 internal class Program
@@ -37,6 +39,7 @@ internal class Program
             });
         });
         builder.Services.AddScoped<UserService>();
+        builder.UseFindRazorSourceFile();
 
         await builder.Build().RunAsync();
     }

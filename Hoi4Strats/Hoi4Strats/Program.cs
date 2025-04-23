@@ -15,6 +15,7 @@ using SharedProj;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using FindRazorSourceFile.Server;
 
 namespace Hoi4Strats;
 
@@ -178,6 +179,8 @@ public class Program
         Endpoints.MapImageUploadEndpoint(app);
         Endpoints.BlobImageUpload(app);
         Tests.TestConnection();
+        app.UseFindRazorSourceFile();
+
 
         // Ensure roles are created when application starts
         using (var scope = app.Services.CreateScope())
