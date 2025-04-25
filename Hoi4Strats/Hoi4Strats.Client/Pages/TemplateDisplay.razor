@@ -1,22 +1,5 @@
 ﻿@using SharedProj.DBModels
 @inject DialogService DialogService
-@* <RadzenPanel>
-    <RadzenStack>
-
-        <RadzenLabel Text="@GuideModel.Title" />
-        <RadzenHtml>
-            @((MarkupString)GuideModel.Content)
-        </RadzenHtml>
-        @foreach (var img in GuideModel.Pictures)
-        {
-            var bla = ToBase64DataUri(img);
-            <RadzenImage Path="@bla" Style="width:500px; cursor: pointer;" @onclick="() => ShowImage(bla)" />
-        }
-
-        <RadzenText>Designed By:@GuideModel.Author</RadzenText>
-        <RadzenText>Created: @GuideModel.CreatedAt</RadzenText>
-    </RadzenStack>
-</RadzenPanel> *@
 
 <div class="rz-p-0 rz-p-md-12">
     <RadzenCard Variant="Variant.Filled" class="rz-my-12 rz-mx-auto" Style="max-width: 1000px">

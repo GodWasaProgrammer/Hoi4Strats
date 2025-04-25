@@ -38,7 +38,8 @@ public class Program
         builder.Services.AddAuthorizationCore(options =>
         {
             options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
-        });// Add services to the container
+        });
+        // Add services to the container
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents()
             .AddInteractiveWebAssemblyComponents();
