@@ -8,18 +8,11 @@ namespace Hoi4Strats.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 
-public class UserController : ControllerBase
+public class UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration? configuration) : ControllerBase
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IConfiguration? _configuration;
-
-    public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration? configuration)
-    {
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _configuration = configuration;
-    }
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+    private readonly IConfiguration? _configuration = configuration;
 
     [Authorize(Roles = "Admin")]
     [HttpGet("GetUsers")]
@@ -53,7 +46,7 @@ public class UserController : ControllerBase
                 return NotFound();
             }
             var currentRoles = await _userManager.GetRolesAsync(user);
-            var identity = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
             await _userManager.AddToRolesAsync(user, updateRolesDto.Roles);
         }
 
