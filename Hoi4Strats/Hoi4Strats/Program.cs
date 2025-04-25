@@ -5,7 +5,6 @@ using Hoi4Strats.Components;
 using Hoi4Strats.Components.Account;
 using Hoi4Strats.Controllers;
 using Hoi4Strats.Data;
-using Hoi4Strats.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -53,7 +52,6 @@ public class Program
         builder.Services.AddScoped<IdentityRedirectManager>();
         builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
         var dbServiceString = DButils.GetConnectionString();
-        builder.Services.AddSingleton<TokenService>();
         builder.Services.AddScoped<DBService>(provider => new DBService(dbServiceString));
         builder.Services.AddScoped<UserService>();
         builder.Services.AddRadzenComponents().AddScoped<ThemeService>().AddScoped<NotificationService>();
@@ -76,7 +74,6 @@ public class Program
 
             // Tokens
             .AddDefaultTokenProviders();
-        builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.Configure<CookiePolicyOptions>(options =>
         {
             options.MinimumSameSitePolicy = SameSiteMode.Lax; // Eller Strict beroende på behov
@@ -121,19 +118,7 @@ public class Program
         {
             options.EnableDetailedErrors = true;
         })
-.AddJsonProtocol();
-        builder.Services.AddScoped<AuthMsgHandler>();
-        builder.Services.AddScoped<AuthenticatedHttpClient>(sp =>
-        {
-            var handler = sp.GetRequiredService<AuthMsgHandler>();
-            handler.InnerHandler = new HttpClientHandler();
-
-            return new AuthenticatedHttpClient(new HttpClient(handler)
-            {
-                BaseAddress = new Uri("https://localhost:7141/")
-            });
-        });
-
+        .AddJsonProtocol();
         var app = builder.Build();
         app.UseCors(policy =>
         {
@@ -174,13 +159,12 @@ public class Program
         app.MapControllers();
         app.UseAuthentication();
         app.UseAuthorization();
-        Endpoints.MapGuideEndpoints(app);
-        Endpoints.MapNewsEndpoint(app);
-        Endpoints.MapImageUploadEndpoint(app);
-        Endpoints.BlobImageUpload(app);
+        app.MapGuideEndpoints();
+        app.MapNewsEndpoint();
+        app.MapImageUploadEndpoint();
+        app.BlobImageUpload();
         Tests.TestConnection();
         app.UseFindRazorSourceFile();
-
 
         // Ensure roles are created when application starts
         using (var scope = app.Services.CreateScope())

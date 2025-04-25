@@ -95,10 +95,10 @@ public class DBService
 
         try
         {
-            using var connection = new SqlConnection(_connectionString);
+            await using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            using var command = new SqlCommand(query, connection);
+            await using var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@Title", guideToUpdate.Title ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Content", guideToUpdate.Content ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Author", guideToUpdate.Author ?? (object)DBNull.Value);

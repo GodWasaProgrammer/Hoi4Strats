@@ -27,17 +27,6 @@ internal class Program
         builder.Services.AddScoped<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
         builder.Services.AddBlazoredLocalStorage();
         builder.Services.AddApiAuthorization();
-        builder.Services.AddScoped<AuthMsgHandler>();
-        builder.Services.AddScoped<AuthenticatedHttpClient>(sp =>
-        {
-            var handler = sp.GetRequiredService<AuthMsgHandler>();
-            handler.InnerHandler = new HttpClientHandler();
-
-            return new AuthenticatedHttpClient(new HttpClient(handler)
-            {
-                BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
-            });
-        });
         builder.Services.AddScoped<UserService>();
         builder.UseFindRazorSourceFile();
 
