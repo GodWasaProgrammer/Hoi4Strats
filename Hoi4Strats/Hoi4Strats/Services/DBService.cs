@@ -149,8 +149,8 @@ public class DBService
                     CreatedAt = reader.GetDateTime(4),
                     Status = (Review)reader.GetInt32(5),
                     GuideType = (GuideTypes)reader.GetInt32(6), // Konvertera int till enum
-                    MajorCountry =(Majors)reader.GetInt32(7),
-                    MinorCountry =(Minors)reader.GetInt32(8)
+                    MajorCountry = (Majors)reader.GetInt32(7),
+                    MinorCountry = (Minors)reader.GetInt32(8)
                 };
                 guide.Pictures = await GetPicturesForGuide(guide.Id);
                 guides.Add(guide);

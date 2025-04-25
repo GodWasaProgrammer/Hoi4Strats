@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SharedProj;
 using SharedProj.DBModels;
-using System;
 
 namespace Hoi4Strats.Data
 {

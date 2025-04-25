@@ -6,7 +6,7 @@ public class ImageModel
     public required byte[] Content { get; set; } // BLOB
     public required string ContentType { get; set; } // MIME-type
     public DateTime CreatedAt { get; set; }
-    
+
     // FK
     public int GuideId { get; set; }
 }

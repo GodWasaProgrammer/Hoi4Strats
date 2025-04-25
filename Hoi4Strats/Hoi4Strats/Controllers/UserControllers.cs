@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedProj;
-using Blazored.LocalStorage;
 
 namespace Hoi4Strats.Controllers;
 [ApiController]
@@ -26,7 +26,7 @@ public class UserController : ControllerBase
         _localStorage = localStorage;
     }
 
-    [Authorize (Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpGet("GetUsers")]
     public async Task<ActionResult<List<ApplicationUser>>> GetUsers()
     {

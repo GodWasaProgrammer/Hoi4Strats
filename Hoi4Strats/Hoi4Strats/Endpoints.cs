@@ -148,9 +148,9 @@ public static class Endpoints
         {
             var steamapi = new SteamApiClient();
             var json = await steamapi.GetNewsForHeartsOfIronAsync();
-        if (json != null) 
-        {
-            var news = JsonConvert.DeserializeObject<Root>(json);
+            if (json != null)
+            {
+                var news = JsonConvert.DeserializeObject<Root>(json);
                 return news != null ? Results.Ok(news) : Results.BadRequest("Deserialization failed.");
             }
             else
