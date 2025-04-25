@@ -19,22 +19,22 @@
 </RadzenPanel> *@
 
 <div class="rz-p-0 rz-p-md-12">
-    <RadzenCard Variant="Variant.Filled" class="rz-my-12 rz-mx-auto" Style="max-width: 600px">
+    <RadzenCard Variant="Variant.Filled" class="rz-my-12 rz-mx-auto" Style="max-width: 1000px">
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
             @foreach (var img in GuideModel.Pictures)
             {
                 var bla = ToBase64DataUri(img);
                 <RadzenImage Path="@bla" Style="width:500px; cursor: pointer;" @onclick="() => ShowImage(bla)" />
             }
+        </RadzenStack>
             <RadzenStack Gap="0">
                 <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Created At</RadzenText>
                 <RadzenText TextStyle="TextStyle.Body1"><b>@GuideModel.CreatedAt</b></RadzenText>
                 <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Author</RadzenText>
                 <RadzenText TextStyle="TextStyle.Body1"><b>@GuideModel.Author</b></RadzenText>
-            </RadzenStack>
-        </RadzenStack>
                 <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Content</RadzenText>
                 <RadzenText TextStyle="TextStyle.Body1"><b>@GuideModel.Content</b></RadzenText>
+            </RadzenStack>
     </RadzenCard>
 </div>
 
