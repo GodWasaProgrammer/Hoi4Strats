@@ -52,12 +52,6 @@ public static class Endpoints
                 return Results.BadRequest("Something went wrong updating your decision");
             }
         });
-
-        //app.MapPost("/create-guide", async (GuideModel guide, DBService dbService) =>
-        //{
-        //    await dbService.CreateGuide(guide);
-        //    return Results.Ok("Guide created successfully");
-        //});
     }
 
     public static void MapImageUploadEndpoint(this WebApplication app)
@@ -98,8 +92,6 @@ public static class Endpoints
                 // Hantera fallet när nyckeln saknas.
                 throw new InvalidOperationException("Upload-Session-Id header is required.");
             }
-
-            //string uploadSessionId = request.Headers["Upload-Session-Id"];
 
             if (file != null && !string.IsNullOrEmpty(uploadSessionId) && Guid.TryParse(uploadSessionId, out var sessionId))
             {

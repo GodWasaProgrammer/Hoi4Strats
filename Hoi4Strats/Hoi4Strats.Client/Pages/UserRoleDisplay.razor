@@ -6,7 +6,7 @@
 
 @if (_isLoading)
 {
-    <span>Laddar roller...</span>
+    <RadzenProgressBarCircular Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
 }
 else
 {
@@ -18,7 +18,7 @@ else
         }
         else
         {
-            <span>@_noRoles</span>
+            <span>No Roles</span>
         }
     }
 }
@@ -27,7 +27,6 @@ else
 {
     [Parameter]
     public string? UserId { get; set; }
-    private string _noRoles = "No Roles";
     private List<string>? _roles;
     private bool _isLoading = true;
 
@@ -55,7 +54,6 @@ else
                     }
                 }
             }
-            //await LoadRolesAsync();
             _isLoading = false;
             await InvokeAsync(StateHasChanged);
         }

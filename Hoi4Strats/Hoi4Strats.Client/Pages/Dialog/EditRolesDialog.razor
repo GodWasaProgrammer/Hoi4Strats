@@ -11,13 +11,11 @@
 @code 
 {
     [Parameter] public ApplicationUser ?SelectedUser { get; set; }
-    [Parameter] public List<string> ?SelectedRoles { get; set; } // För valda roller
-    [Parameter] public List<string> ?Roles { get; set; } // Roller som ska visas i drop-down
+    [Parameter] public List<string> ?SelectedRoles { get; set; }
+    [Parameter] public List<string> ?Roles { get; set; }
 
     private void SaveChanges()
     {
         DialogService.Close(SelectedRoles);
-
-        // Skickar tillbaka de valda rollerna som resultat
     }
 }

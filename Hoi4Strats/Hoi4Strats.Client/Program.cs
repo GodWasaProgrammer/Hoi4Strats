@@ -1,4 +1,3 @@
-using Blazored.LocalStorage;
 using FindRazorSourceFile.WebAssembly;
 using Hoi4Strats.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -25,7 +24,6 @@ internal class Program
             options.IsSecure = true;
         });
         builder.Services.AddScoped<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
-        builder.Services.AddBlazoredLocalStorage();
         builder.Services.AddApiAuthorization();
         builder.Services.AddScoped<UserService>();
         builder.UseFindRazorSourceFile();

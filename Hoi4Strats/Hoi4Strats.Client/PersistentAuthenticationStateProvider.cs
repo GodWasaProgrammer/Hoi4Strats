@@ -25,7 +25,6 @@ namespace Hoi4Strats.Client
             new Claim(ClaimTypes.Email, userInfo.Email)
         };
 
-            // Lägg till roller som klämmor
             foreach (var role in userInfo.Roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));

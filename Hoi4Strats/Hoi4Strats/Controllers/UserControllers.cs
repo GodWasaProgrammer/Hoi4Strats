@@ -1,5 +1,4 @@
-﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,16 +13,12 @@ public class UserController : ControllerBase
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration? _configuration;
-    private readonly ITokenService _tokenService;
-    private readonly ILocalStorageService _localStorage;
 
-    public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration? configuration, ITokenService tokenService, ILocalStorageService localStorage)
+    public UserController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration? configuration)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
-        _tokenService = tokenService;
-        _localStorage = localStorage;
     }
 
     [Authorize(Roles = "Admin")]
@@ -72,34 +67,4 @@ public class UserController : ControllerBase
         var roles = await _roleManager.Roles.Select(role => role.Name).ToListAsync();
         return Ok(roles);
     }
-
-    [Obsolete] // Login goes via identity pages
-    [HttpPost("Login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
-    {
-        var user = await _userManager.FindByNameAsync(loginDto.Username);
-        if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
-        {
-            var roles = await _userManager.GetRolesAsync(user);
-            var token = _tokenService.GenerateToken(user.Id, roles.ToList());
-            // locally store the token
-            await _localStorage.SetItemAsync($"authToken_{user.Id}", token);
-            Console.WriteLine($"Token written for:{user.Id}");
-
-            return Ok(new { Token = token });
-        }
-
-        return Unauthorized("Invalid username or password");
-    }
-
-    //[HttpPost("LogOut")]
-    //public async Task<IActionResult> Logout()
-    //{
-    //    await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
-    //    foreach (var cookie in Request.Cookies.Keys)
-    //    {
-    //        Response.Cookies.Delete(cookie);
-    //    }
-    //    return Ok(); // Säkerställ att detta returnerar 200 OK
-    //}
 }
