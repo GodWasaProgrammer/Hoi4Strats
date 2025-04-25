@@ -1,9 +1,7 @@
-using Blazored.LocalStorage;
 using FindRazorSourceFile.Server;
 using Hoi4Strats.Client.Services;
 using Hoi4Strats.Components;
 using Hoi4Strats.Components.Account;
-using Hoi4Strats.Controllers;
 using Hoi4Strats.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -13,8 +11,6 @@ using Microsoft.IdentityModel.Tokens;
 using Radzen;
 using SharedProj;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Hoi4Strats;
 
@@ -81,16 +77,7 @@ public class Program
         });
 
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-        builder.Services.AddBlazoredLocalStorage(config =>
-        {
-            config.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
-            config.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            config.JsonSerializerOptions.IgnoreReadOnlyProperties = true;
-            config.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-            config.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            config.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
-            config.JsonSerializerOptions.WriteIndented = false;
-        });
+
         // .NET 9 setup of TLS 1.2
         builder.Services.AddScoped(sp =>
         {
