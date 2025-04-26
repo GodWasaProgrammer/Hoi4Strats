@@ -3,11 +3,7 @@
 @using SharedProj
 @using Radzen
 @using System.Text.Json
-
-<h3>GuideInspector</h3>
 <AuthorizeView Roles="Admin, GuideAdmin">
-
-    <h3>This is where Guide Administrator approve Guides/Templates</h3>
     @if (!GuideSelected)
     {
         <RadzenButton Click="(() => ToggleList(_UnderReview))">Pending Reviews</RadzenButton>
