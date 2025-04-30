@@ -14,7 +14,7 @@
             else if (machineName == "MSI")
             {
                 // laptop
-                return "data source=MSI;initial catalog=SiteDB;trusted_connection=true;TrustServerCertificate=True;";
+                return "data source=MSI\\hoi4strats;initial catalog=SiteDB;trusted_connection=true;TrustServerCertificate=True;";
             }
             else
             {
