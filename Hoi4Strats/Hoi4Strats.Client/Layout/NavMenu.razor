@@ -10,28 +10,32 @@
     <RadzenPanelMenu>
         <RadzenPanelMenuItem Path="/" Text="Home" Icon="home" />
         <RadzenPanelMenuItem Path="/Land" Text="Land">
-            <RadzenPanelMenuItem Text="Templates" />
-            <RadzenPanelMenuItem Text="Offence" />
-            <RadzenPanelMenuItem Text="Defence" />
+            <RadzenPanelMenuItem Text="Templates">
+                @foreach(var template in Enum.GetValues(typeof(LandTemplate)))
+                {
+                    <RadzenPanelMenuItem Path="/LandTemplates" Text="@template.ToString()"></RadzenPanelMenuItem>
+                }
+            </RadzenPanelMenuItem>
             <RadzenPanelMenuItem Text="Battle Planning" />
-            <RadzenPanelMenuItem Text="Micro" />
         </RadzenPanelMenuItem>
         <RadzenPanelMenuItem Path="/Sea" Text="Sea">
-            <RadzenPanelMenuItem Text="Templates" />
+            <RadzenPanelMenuItem Text="Templates">
+                @foreach(var template in Enum.GetValues(typeof(NavalTemplate)))
+                {
+                    <RadzenPanelMenuItem Text="@template.ToString()"></RadzenPanelMenuItem>
+                }
+            </RadzenPanelMenuItem>
             <RadzenPanelMenuItem Text="Naval Superiority" />
-            <RadzenPanelMenuItem Text="General" />
         </RadzenPanelMenuItem>
         <RadzenPanelMenuItem Path="Air" Text="Air">
             <RadzenPanelMenuItem Text="Templates">
-                <RadzenPanelMenuItem Text="Fighter" />
-                <RadzenPanelMenuItem Text="Close Air Support" />
-                <RadzenPanelMenuItem Text="Strategic Bomber" />
-                <RadzenPanelMenuItem Text="Naval Bomber" />
-                <RadzenPanelMenuItem Text="Carrier Naval Bomber" />
+                @foreach(var template in Enum.GetValues(typeof(AirTemplate)))
+                {
+                    <RadzenPanelMenuItem Text="@template.ToString()"></RadzenPanelMenuItem>
+                }
             </RadzenPanelMenuItem>
 
             <RadzenPanelMenuItem Text="Air Superiority" />
-            <RadzenPanelMenuItem Text="General" />
         </RadzenPanelMenuItem>
         <RadzenPanelMenuItem Path="Country" Text="Country">
             <RadzenPanelMenuItem Text="Majors">
