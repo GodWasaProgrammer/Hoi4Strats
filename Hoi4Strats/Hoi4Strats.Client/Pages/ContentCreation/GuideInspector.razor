@@ -1,45 +1,57 @@
 ﻿@page "/Inspector"
+@using Hoi4Strats.Client.Services
 @using SharedProj.DBModels
 @using SharedProj
 @using Radzen
 @using System.Text.Json
+@inject DataService dataService
 <AuthorizeView Roles="Admin, GuideAdmin">
-    @if (!GuideSelected)
+    @if (IsAppLoaded)
     {
-        <RadzenButton Click="(() => ToggleList(_UnderReview))">Pending Reviews</RadzenButton>
-        <RadzenButton Click="(() => ToggleList(ApprovedGuides))">Approved Guides</RadzenButton>
-        <RadzenButton Click="(() => ToggleList(RejectGuides))">Rejected Guides</RadzenButton>
 
-        @if (ViewGuides)
+        @if (!GuideSelected)
         {
-            <div>
-                <RadzenDataGrid TItem="GuideModel" Data="@DisplayList" AllowPaging="true" PageSize="pagesize" RowClick="OnCountryGuideClicked">
-                    <Columns>
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.Title)" Title="Title" />
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.Pictures)" Title="No. Of Pics">
-                            <Template Context="guide">
-                                @guide.Pictures?.Count
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.GuideType)" Title="Type" />
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.MajorCountry)" Title="Major" />
-                        <RadzenDataGridColumn Property="@nameof(GuideModel.MinorCountry)" Title="Minor" />
-                    </Columns>
-                </RadzenDataGrid>
-            </div>
+            <RadzenButton Click="(() => ToggleList(_UnderReview))">Pending Reviews</RadzenButton>
+            <RadzenButton Click="(() => ToggleList(ApprovedGuides))">Approved Guides</RadzenButton>
+            <RadzenButton Click="(() => ToggleList(RejectGuides))">Rejected Guides</RadzenButton>
+
+            @if (ViewGuides)
+            {
+                <div>
+                    <RadzenDataGrid TItem="GuideModel" Data="@DisplayList" AllowPaging="true" PageSize="pagesize" RowClick="OnCountryGuideClicked">
+                        <Columns>
+                            <RadzenDataGridColumn Property="@nameof(GuideModel.Title)" Title="Title" />
+                            <RadzenDataGridColumn Property="@nameof(GuideModel.Author)" Title="Author" />
+                            <RadzenDataGridColumn Property="@nameof(GuideModel.CreatedAt)" Title="Created" />
+                            <RadzenDataGridColumn Property="@nameof(GuideModel.Pictures)" Title="No. Of Pics">
+                                <Template Context="guide">
+                                    @guide.Pictures?.Count
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Property="@nameof(GuideModel.GuideType)" Title="Type" />
+                            <RadzenDataGridColumn Property="@nameof(GuideModel.MajorCountry)" Title="Major" />
+                            <RadzenDataGridColumn Property="@nameof(GuideModel.MinorCountry)" Title="Minor" />
+                        </Columns>
+                    </RadzenDataGrid>
+                </div>
+            }
+        }
+        @if (GuideSelected)
+        {
+            <Inspector GM="@_GM" ResetSelection="ResetSelection" />
+            <RadzenButton Click="ResetSelection">Cancel</RadzenButton>
         }
     }
-    @if (GuideSelected)
+    else
     {
-        <Inspector GM="@_GM" ResetSelection="ResetSelection" />
-        <RadzenButton Click="ResetSelection">Cancel</RadzenButton>
+        <RadzenProgressBarCircular Value="75" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
     }
 </AuthorizeView>
 
 @code
 {
+    private bool IsAppLoaded;
+
     List<GuideModel> DisplayList = new();
     List<GuideModel> ApprovedGuides = new();
     List<GuideModel> RejectGuides = new();
@@ -58,76 +70,32 @@
         ViewGuides = true;
     }
 
-    private async void ResetSelection()
+    private void ResetSelection()
     {
         GuideSelected = false;
         _GM = null;
-        await PageSetUp();
+        PageSetUp();
         StateHasChanged();
     }
 
-    private async Task<List<GuideModel>> FetchReviewGuides()
+    private async void PageSetUp()
     {
-        var client = new HttpClient { BaseAddress = new Uri("https://localhost:7141/") }; // Ange korrekt basadress för API:et
-
-        try
-        {
-            var response = await client.GetAsync("/get-guides");
-
-            if (response.IsSuccessStatusCode)
-            {
-                var jsonData = await response.Content.ReadAsStringAsync();
-                var guides = JsonSerializer.Deserialize<List<GuideModel>>(jsonData, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                if (guides != null)
-                {
-                    Console.WriteLine($"Fetched {guides.Count} guides for inspector.");
-                    return guides;
-                }
-            }
-            else
-            {
-                Console.WriteLine($"Failed to fetch guides: {response.StatusCode}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Exception when fetching guides: {ex.Message}");
-        }
-        // fallback
-        return new List<GuideModel>();
+        await dataService.BuildLists();
+        ApprovedGuides = [];
+        ApprovedGuides = dataService.ApprovedGuides;
+        RejectGuides = [];
+        RejectGuides = dataService.RejectedGuides;
+        _UnderReview = [];
+        _UnderReview = dataService.UnderReviewGuides;
+        IsAppLoaded = true;
+        StateHasChanged();
     }
 
-    private async Task PageSetUp()
+    protected override void OnInitialized()
     {
-        var guides = await FetchReviewGuides();
-        _UnderReview = new();
-        RejectGuides = new();
-        ApprovedGuides = new();
+        PageSetUp();
 
-        foreach (var guide in guides)
-        {
-            if (guide.Status == Review.UnderReview)
-            {
-                _UnderReview.Add(guide);
-            }
-            if (guide.Status == Review.Approved)
-            {
-                ApprovedGuides.Add(guide);
-            }
-            if (guide.Status == Review.Rejected)
-            {
-                RejectGuides.Add(guide);
-            }
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await PageSetUp();
+        StateHasChanged();
     }
 
     private void OnTemplateGuideClicked(DataGridRowMouseEventArgs<GuideModel> ClickedGuide)

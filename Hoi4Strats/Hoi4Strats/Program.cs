@@ -50,6 +50,7 @@ public class Program
         builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
         var dbServiceString = DButils.GetConnectionString();
         builder.Services.AddScoped<DBService>(provider => new DBService(dbServiceString));
+        builder.Services.AddSingleton<DataService>();
         builder.Services.AddScoped<UserService>();
         builder.Services.AddRadzenComponents().AddScoped<ThemeService>().AddScoped<NotificationService>();
         builder.Services.AddRadzenCookieThemeService(options =>
@@ -108,6 +109,7 @@ public class Program
         })
         .AddJsonProtocol();
         var app = builder.Build();
+
         app.UseCors(policy =>
         {
             policy.WithOrigins("https://localhost:7141")
@@ -143,7 +145,6 @@ public class Program
         });
         app.UseRouting();
         app.UseAntiforgery();
-
         app.MapControllers();
         app.UseAuthentication();
         app.UseAuthorization();
@@ -160,7 +161,6 @@ public class Program
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             await Tests.EnsureRolesCreated(roleManager);
         }
-
         await app.RunAsync();
     }
 }
