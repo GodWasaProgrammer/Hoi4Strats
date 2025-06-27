@@ -1,57 +1,26 @@
-﻿@using SharedProj
+﻿@using Hoi4Strats.Client.Services
+@using SharedProj
 @using SharedProj.DBModels
 @using System.Text.Json
+@inject DataService ds
 @page "/LandTemplates"
 
-@foreach(var guide in _templatesToDisplay)
+@foreach (var guide in _templatesToDisplay)
 {
-    <TemplateDisplay GuideModel="guide"></TemplateDisplay>
+	<TemplateDisplay GuideModel="guide"></TemplateDisplay>
 }
 
-@code 
+@code
 {
-    private List<GuideModel> _templatesToDisplay = new();
+	private List<GuideModel> _templatesToDisplay = new();
 
-    private async Task<List<GuideModel>> FetchReviewGuides()
-    {
-        var client = new HttpClient { BaseAddress = new Uri("https://localhost:7141/") }; // Ange korrekt basadress för API:et
+	private void PageSetup()
+	{
+		_templatesToDisplay = ds.LandTemplates;
+	}
 
-        try
-        {
-            var response = await client.GetAsync("/get-guides");
-
-            if (response.IsSuccessStatusCode)
-            {
-                var jsonData = await response.Content.ReadAsStringAsync();
-                var guides = JsonSerializer.Deserialize<List<GuideModel>>(jsonData, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                if (guides != null)
-                {
-                    Console.WriteLine($"Fetched {guides.Count} guides for inspector.");
-                    return guides;
-                }
-            }
-            else
-            {
-                Console.WriteLine($"Failed to fetch guides: {response.StatusCode}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Exception when fetching guides: {ex.Message}");
-        }
-        // fallback
-        return new List<GuideModel>();
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var x = await FetchReviewGuides();
-
-        x = x.FindAll(x => x.Status == Review.Approved);
-        _templatesToDisplay = x;
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		PageSetup();
+	}
 }

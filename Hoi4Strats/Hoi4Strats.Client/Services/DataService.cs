@@ -15,11 +15,24 @@ public class DataService
 
     private List<GuideModel> _underReviewGuides = [];
     public List<GuideModel> UnderReviewGuides { get { return _underReviewGuides; } }
+
+    private List<GuideModel> _landTemplates = [];
+    public List<GuideModel> LandTemplates { get { return _landTemplates; } }
+
+    private List<GuideModel> _airTemplates = [];
+    public List<GuideModel> AirTemplates { get { return _airTemplates; } }
+
+    public List<GuideModel> _seaTemplates = [];
+    public List<GuideModel> SeaTemplates { get { return _seaTemplates; } }
+
+    private List<GuideModel> _countryGuides = [];
+    public List<GuideModel> CountryGuides { get { return _countryGuides; } }
+
     public bool Built { get { return _built; } }
     private bool _built { get; set; }
     public DataService()
     {
-        // Privat konstruktor för att tvinga användning av CreateAsync
+        
     }
 
     public async Task BuildLists()
@@ -58,6 +71,20 @@ public class DataService
         else
         {
             Console.WriteLine("DataService Already Initialized");
+        }
+        if (Built)
+        {
+
+            var landtemplates = _approvedGuides.FindAll(x => x.GuideType == GuideTypes.LandTemplate);
+            _landTemplates = landtemplates;
+
+            var airtemplates = _approvedGuides.FindAll(x => x.GuideType == GuideTypes.AirTemplate);
+            _airTemplates = airtemplates;
+
+            var seatemplates = _approvedGuides.FindAll(x => x.GuideType == GuideTypes.NavalTemplate);
+
+            var countryguides = _approvedGuides.FindAll(x => x.GuideType == GuideTypes.Country);
+            _countryGuides = countryguides;
         }
     }
 

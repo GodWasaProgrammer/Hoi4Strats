@@ -153,6 +153,8 @@ public class Program
         app.MapImageUploadEndpoint();
         app.BlobImageUpload();
         Tests.TestConnection();
+        var dataService = app.Services.GetRequiredService<DataService>();
+        await dataService.BuildLists();
         app.UseFindRazorSourceFile();
 
         // Ensure roles are created when application starts

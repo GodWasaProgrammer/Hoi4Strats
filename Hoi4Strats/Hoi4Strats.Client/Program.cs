@@ -27,6 +27,7 @@ internal class Program
         builder.Services.AddApiAuthorization();
         builder.Services.AddScoped<UserService>();
         builder.Services.AddSingleton<DataService>();
+        
         builder.UseFindRazorSourceFile();
 
         await builder.Build().RunAsync();
