@@ -1,9 +1,9 @@
 ﻿@implements IDisposable
-
 @inject NavigationManager NavigationManager
 @using Hoi4Strats.Client
 @inject AuthenticationStateProvider prov
 @inherits LayoutComponentBase
+@using Hoi4Strats.Client.Pages
 @using SharedProj
 @layout MainLayout
 <RadzenSidebar>
@@ -11,10 +11,7 @@
         <RadzenPanelMenuItem Path="/" Text="Home" Icon="home" />
         <RadzenPanelMenuItem Path="/Land" Text="Land">
             <RadzenPanelMenuItem Text="Templates">
-                @foreach(var template in Enum.GetValues(typeof(LandTemplate)))
-                {
-                    <RadzenPanelMenuItem Path="/LandTemplates" Text="@template.ToString()"></RadzenPanelMenuItem>
-                }
+                <LandMenu/>
             </RadzenPanelMenuItem>
             <RadzenPanelMenuItem Text="Battle Planning" />
         </RadzenPanelMenuItem>

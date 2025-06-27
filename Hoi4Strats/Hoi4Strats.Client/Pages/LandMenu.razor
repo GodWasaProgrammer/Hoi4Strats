@@ -1,0 +1,23 @@
+﻿@using Hoi4Strats.Client.Services
+@inject DataService ds
+
+<RadzenPanelMenu>
+	<RadzenPanelMenuItem Path="/Templates" Text="Infantry" />
+	<RadzenPanelMenuItem Path="/Templates" Text="Tanks" />
+	<RadzenPanelMenuItem Path="/Templates" Text="Motorized" />
+	<RadzenPanelMenuItem Path="/Templates" Text="SpaceMarines" />
+	<RadzenPanelMenuItem Path="/Templates" Text="Cavalry" />
+	<RadzenPanelMenuItem Path="/Templates" Text="Garrison" />
+</RadzenPanelMenu>
+
+@code
+{
+	protected override async Task OnInitializedAsync()
+	{
+		if (!ds.Built)
+		{
+			await ds.BuildLists();
+		}
+	}
+}
+

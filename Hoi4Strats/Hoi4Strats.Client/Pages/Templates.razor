@@ -1,0 +1,47 @@
+﻿@using Hoi4Strats.Client.Services
+@using SharedProj
+@using SharedProj.DBModels
+@using System.Text.Json
+@inject DataService ds
+@page "/Templates"
+
+@foreach (var guide in _templatesToDisplay)
+{
+	<TemplateDisplay GuideModel="guide"></TemplateDisplay>
+}
+
+@code
+{
+	[Parameter]
+	public LandTemplate landTemplate { get; set; }
+	private List<GuideModel> _templatesToDisplay = new();
+
+	private void PageSetup()
+	{
+		if (landTemplate == LandTemplate.Infantry)
+		{
+			_templatesToDisplay = ds.LandTemplates.FindAll(x => x.TypeofTemplate == "Infantry");
+		}
+		if(landTemplate == LandTemplate.Cavalry)
+		{
+			_templatesToDisplay = ds.LandTemplates.FindAll(x => x.TypeofTemplate == "Cavalry");
+		}
+		if(landTemplate == LandTemplate.SpaceMarine)
+		{
+			_templatesToDisplay = ds.LandTemplates.FindAll(x => x.TypeofTemplate == "SpaceMarine");
+		}
+		if(landTemplate == LandTemplate.MotorizedInfantry)
+		{
+			_templatesToDisplay = ds.LandTemplates.FindAll(x => x.TypeofTemplate == "Motorized");
+		}
+		if(landTemplate == LandTemplate.Tank)
+		{
+			_templatesToDisplay = ds.LandTemplates.FindAll(x => x.TypeofTemplate == "Tank");
+		}
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		PageSetup();
+	}
+}

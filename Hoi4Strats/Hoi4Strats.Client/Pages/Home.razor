@@ -1,5 +1,17 @@
 ﻿@using Hoi4Strats
+@using Hoi4Strats.Client.Services
+@inject DataService ds
 
 @page "/"
 <InSiteNewsFeed></InSiteNewsFeed>
 <RenderMode/>
+@code
+{
+	protected override async Task OnInitializedAsync()
+	{
+		if(!ds.Built)
+		{
+			await ds.BuildLists();
+		}
+	}
+}
