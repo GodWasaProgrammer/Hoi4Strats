@@ -12,5 +12,5 @@ public class GuideModel
     public List<ImageModel>? Pictures { get; set; } = [];
     public Review Status { get; set; } = Review.UnderReview;
     public required GuideTypes GuideType { get; set; }
-    public string? TypeofTemplate { get; set; }
+    public string TypeofTemplate { get; set; } = "";
 }
